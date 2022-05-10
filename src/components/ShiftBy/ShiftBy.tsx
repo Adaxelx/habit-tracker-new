@@ -2,7 +2,7 @@ import React, { ReactElement } from 'react';
 
 //www.joshwcomeau.com/snippets/react-components/shift-by/
 
-https: interface Props {
+interface Props {
   x?: number;
   y?: number;
   children: ReactElement;
