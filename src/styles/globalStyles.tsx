@@ -72,6 +72,23 @@ export const ResetStyle = createGlobalStyle`${css`
 `}
 `;
 
-const GlobalStyles = <ResetStyle />;
-
-export default GlobalStyles;
+export const GlobalStyles = createGlobalStyle`${css`
+  h1 {
+    font-size: ${({ theme }) => theme.fontSizes[48]};
+    line-height: 1;
+  }
+  h2 {
+    font-size: ${({ theme }) => theme.fontSizes[40]};
+    line-height: 1.2;
+  }
+  h3 {
+    font-size: ${({ theme }) => theme.fontSizes[32]};
+    line-height: 1.3;
+  }
+  h4 {
+    font-size: ${({ theme }) => theme.fontSizes[24]};
+  }
+  h5 {
+    font-size: ${({ theme }) => theme.fontSizes[20]};
+  }
+`}`;

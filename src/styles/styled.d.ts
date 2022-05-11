@@ -1,22 +1,17 @@
 import 'styled-components';
 
+import { FontSizes, Grays, Spacing } from './utils';
+
 declare module 'styled-components' {
   export interface DefaultTheme {
     colors: {
-      grays: {
-        50: string;
-        100: string;
-        200: string;
-        300: string;
-        400: string;
-        500: string;
-        600: string;
-        700: string;
-        800: string;
-        900: string;
-        1000: string;
-      };
+      grays: Record<Grays, string>;
     };
+    cornerRadius: {
+      regular: string;
+    };
+    fontSizes: Record<FontSizes, string>;
+    spacing: Record<Spacing, string>;
   }
 
   export type PolymorphicComponent = keyof JSX.IntrinsicElements | React.ComponentType<any>;
