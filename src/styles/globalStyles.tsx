@@ -73,6 +73,7 @@ export const ResetStyle = createGlobalStyle`${css`
 `;
 
 export const GlobalStyles = createGlobalStyle`${css`
+  color: ${({ theme }) => theme.colors.grays[50]};
   h1 {
     font-size: ${({ theme }) => theme.fontSizes[48]};
     line-height: 1;

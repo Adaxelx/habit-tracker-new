@@ -10,25 +10,11 @@ const activities = [
     title: 'Reading a book',
     timeStart: '16:00',
     timeEnd: '16:30',
-    description: '',
+    description: 'Read a book for 30 minut every day as a good habit.',
     checked: false,
   },
   {
     title: 'Reading a book2',
-    timeStart: '16:00',
-    timeEnd: '16:30',
-    description: '',
-    checked: false,
-  },
-  {
-    title: 'Reading a book3',
-    timeStart: '16:00',
-    timeEnd: '16:30',
-    description: '',
-    checked: false,
-  },
-  {
-    title: 'Reading a book4',
     timeStart: '16:00',
     timeEnd: '16:30',
     description: '',
@@ -65,8 +51,9 @@ const Wrapper = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: ${({ theme }) => `${theme.spacing[24]} ${theme.spacing[32]} 0`};
+  padding: ${({ theme }) => `${theme.spacing[24]} ${theme.spacing[16]} 0`};
   width: 100%;
+  max-width: 340px;
   height: 600px;
   border-radius: ${({ theme }) => theme.cornerRadius.regular};
   background-color: ${({ theme }) => theme.colors.grays[1000]};
@@ -80,15 +67,14 @@ const Date = styled.p`
 
 const ActivityWrapper = styled.div`
   position: relative;
-  display: flex;
-  flex-direction: column;
   width: 100%;
   flex: 1;
-  margin-right: ${({ theme }) => `-${theme.spacing[32]}`};
-
   padding: ${({ theme }) => `${theme.spacing[48]} 0 ${theme.spacing[24]} 0`};
   gap: ${({ theme }) => theme.spacing[16]};
   overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
 `;
 
 const Line = styled.div`
@@ -98,5 +84,5 @@ const Line = styled.div`
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  background-color: ${({ theme }) => theme.colors.grays[700]};
+  background-color: ${({ theme }) => theme.colors.grays[900]};
 `;
