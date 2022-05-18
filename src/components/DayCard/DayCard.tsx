@@ -1,3 +1,4 @@
+import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
 import styled from 'styled-components';
 
@@ -29,6 +30,7 @@ const DayCard = ({ date }: { date: Date }) => {
   const month = dayjsDate.month();
   const year = dayjsDate.year();
 
+  // const queryInfo = useQuery(['labels']);
   const formatDayOfWeek = useFormattedMessage(`calendar.dayOfWeek.${dayOfWeek}`);
 
   return (

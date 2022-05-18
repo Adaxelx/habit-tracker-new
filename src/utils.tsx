@@ -1,7 +1,9 @@
 import React from 'react';
 import { IntlProvider } from 'react-intl';
+import { QueryKey } from 'react-query';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { tokenKey } from 'consts';
 import IntlPolyfill from 'intl';
 import { ThemeProvider } from 'styled-components';
 import { theme } from 'styles/theme';
@@ -16,12 +18,7 @@ export const setupPolyfills = () => {
   }
 };
 
-const customRender = (
-  ui: React.ReactElement,
-  { orderProposalInitialState, loaderInitialState, ...options }: any = {
-    orderProposalInitialState: { orderProposalId: '123' },
-  }
-) => {
+const customRender = (ui: React.ReactElement, options: Record<string, any> = {}) => {
   const AllTheProviders = ({ children }: any) => (
     <IntlProvider locale={locale.EN} messages={flattenMessages(messages[locale.EN])}>
       <ThemeProvider theme={theme}>{children}</ThemeProvider>
@@ -46,3 +43,51 @@ export const range = (start: number, end: number, step = 1) => {
   }
   return output;
 };
+
+export const generateUrlFromQueryKey = (queryKeys: QueryKey) => {
+  return queryKeys.reduce(
+    (previousUrl, queryKey) =>
+      queryKey && typeof queryKey === 'object'
+        ? `${previousUrl}${Object.entries(queryKey).reduce(
+            (previousPartOfUrl, [key, value], index) =>
+              `${previousPartOfUrl}${index === 0 ? '?' : '&'}${key}=${
+                Array.isArray(value) ? value.join(',') : value
+              }`,
+            ''
+          )}`
+        : `${previousUrl}/${queryKey}`,
+    ''
+  ) as string;
+};
+
+export function client(endpoint: string, { body, ...customConfig }: any = {}) {
+  const token = window.localStorage.getItem(tokenKey);
+  console.log(token);
+  const headers: any = { 'content-type': 'application/json' };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const config = {
+    method: body ? 'POST' : 'GET',
+    ...customConfig,
+    headers: {
+      ...headers,
+      ...customConfig.headers,
+    },
+  };
+  if (body) {
+    config.body = JSON.stringify(body);
+  }
+
+  return window
+    .fetch(`${process.env.REACT_APP_API_URL}${endpoint}`, config)
+    .then(async response => {
+      if (response.ok) {
+        return await response.json();
+      } else {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage);
+      }
+    });
+}
