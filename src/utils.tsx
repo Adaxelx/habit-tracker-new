@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { IntlProvider } from 'react-intl';
-import { QueryKey } from 'react-query';
+import { QueryClient, QueryClientProvider, QueryKey } from 'react-query';
+import { BrowserRouter } from 'react-router-dom';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { tokenKey } from 'consts';
@@ -18,13 +19,22 @@ export const setupPolyfills = () => {
   }
 };
 
-const customRender = (ui: React.ReactElement, options: Record<string, any> = {}) => {
+export const getEnviromentalVariable = (ENV: 'API_URL') => process.env[`REACT_APP_${ENV}`];
+
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 0 } } });
+
+const customRender = (ui: React.ReactElement, options: Record<string, any> = { route: '/' }) => {
+  window.history.pushState({}, 'Test page', options.route);
   const AllTheProviders = ({ children }: any) => (
-    <IntlProvider locale={locale.EN} messages={flattenMessages(messages[locale.EN])}>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
-    </IntlProvider>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <IntlProvider locale={locale.EN} messages={flattenMessages(messages[locale.EN])}>
+          <ThemeProvider theme={theme}>{children}</ThemeProvider>
+        </IntlProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
   );
-  return render(ui, { wrapper: AllTheProviders, ...options });
+  return { ...render(ui, { wrapper: AllTheProviders, ...options }), user: userEvent.setup() };
 };
 // re-export everything
 export * from '@testing-library/react';
@@ -62,7 +72,6 @@ export const generateUrlFromQueryKey = (queryKeys: QueryKey) => {
 
 export function client(endpoint: string, { body, ...customConfig }: any = {}) {
   const token = window.localStorage.getItem(tokenKey);
-  console.log(token);
   const headers: any = { 'content-type': 'application/json' };
   if (token) {
     headers.Authorization = `Bearer ${token}`;
@@ -84,10 +93,16 @@ export function client(endpoint: string, { body, ...customConfig }: any = {}) {
     .fetch(`${process.env.REACT_APP_API_URL}${endpoint}`, config)
     .then(async response => {
       if (response.ok) {
-        return await response.json();
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.indexOf('application/json') !== -1) {
+          return await response.json();
+        }
       } else {
-        const errorMessage = await response.text();
-        throw new Error(errorMessage);
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.indexOf('application/json') !== -1) {
+          const errorMessage = await response.json();
+          throw new Error(errorMessage?.message);
+        }
       }
     });
 }

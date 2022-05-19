@@ -68,6 +68,7 @@ export const ResetStyle = createGlobalStyle`${css`
   #root,
   #__next {
     isolation: isolate;
+    height: 100%;
   }
 `}
 `;

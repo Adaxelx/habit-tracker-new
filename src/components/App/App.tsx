@@ -1,7 +1,10 @@
+import 'react-toastify/dist/ReactToastify.css';
+
 import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import updateLocale from 'dayjs/plugin/updateLocale';
@@ -12,7 +15,9 @@ import { theme } from 'styles/theme';
 import messages, { flattenMessages, locale } from 'translations';
 import { client, generateUrlFromQueryKey } from 'utils';
 
-import DayCard from 'components/DayCard';
+// import DayCard from 'components/DayCard';
+import Login from 'components/Login';
+import ToastContainer, { showToast } from 'components/ToastContainer';
 
 dayjs.extend(isoWeek);
 dayjs.extend(updateLocale);
@@ -22,16 +27,21 @@ dayjs.updateLocale('en', {
   weekdays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
 });
 
-const mockedDay = {
-  date: new Date(),
-};
-
 const MergedGlobalStyles = () => (
   <>
     <GlobalStyles />
     <ResetStyle />
   </>
 );
+
+type ErrorType = {
+  message: string;
+};
+
+const onError = (err: unknown) => {
+  const error = err as ErrorType;
+  showToast(error.message, { type: 'error' });
+};
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,6 +50,10 @@ const queryClient = new QueryClient({
         const url = generateUrlFromQueryKey(queryKey);
         return client(url);
       },
+      onError,
+    },
+    mutations: {
+      onError,
     },
   },
 });
@@ -50,7 +64,13 @@ function App() {
       <ThemeProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
           <MergedGlobalStyles />
-          <DayCard {...mockedDay} />
+          {/* <DayCard {...mockedDay} /> */}
+          <ToastContainer />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<Login />}></Route>
+            </Routes>
+          </BrowserRouter>
           <ReactQueryDevtools />
         </QueryClientProvider>
       </ThemeProvider>
