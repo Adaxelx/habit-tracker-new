@@ -16,7 +16,8 @@ import messages, { flattenMessages, locale } from 'translations';
 import { client, generateUrlFromQueryKey } from 'utils';
 
 // import DayCard from 'components/DayCard';
-import Login from 'components/Login';
+import { Login, Register } from 'components/Account';
+import HabitTracker from 'components/HabitTracker';
 import ToastContainer, { showToast } from 'components/ToastContainer';
 
 dayjs.extend(isoWeek);
@@ -68,7 +69,9 @@ function App() {
           <ToastContainer />
           <BrowserRouter>
             <Routes>
-              <Route path="/login" element={<Login />}></Route>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/habit-tracker" element={<HabitTracker />} />
             </Routes>
           </BrowserRouter>
           <ReactQueryDevtools />

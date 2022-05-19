@@ -10,12 +10,15 @@ const NativeButton = styled.button`
   height: 48px;
   min-width: ${({ theme }) => theme.spacing[128]};
   padding: ${({ theme }) => `${theme.spacing[8]} ${theme.spacing[16]}`};
-
   font-size: ${({ theme }) => theme.fontSizes[16]};
   color: ${({ theme }) => theme.colors.grays[900]};
   background-color: ${({ theme }) => theme.colors.grays[500]};
   border: none;
   border-radius: ${({ theme }) => theme.cornerRadius.regular};
+
+  &:disabled {
+    background-color: ${({ theme }) => theme.colors.grays[700]};
+  }
 `;
 
 // import { ButtonHTMLAttributes } from 'react';

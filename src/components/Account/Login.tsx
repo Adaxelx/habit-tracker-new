@@ -1,6 +1,7 @@
 import React from 'react';
 import { useMutation } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import { tokenKey } from 'consts';
 import styled from 'styled-components';
 import { client } from 'utils';
 
@@ -15,14 +16,20 @@ interface LoginFormElement extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
+type LoginData = {
+  token: string;
+};
+
+type MutationData = { login: string; password: string };
+
 export default function Login() {
   const navigate = useNavigate();
-  const loginMutation = useMutation(
-    (credentials: { login: string; password: string }) =>
-      client('/users/login', { body: credentials }),
+  const { isLoading, mutate } = useMutation<LoginData, any, MutationData>(
+    credentials => client('/users/login', { body: credentials }),
     {
-      onSuccess: () => {
+      onSuccess: data => {
         navigate('/calendar');
+        window.localStorage.setItem(tokenKey, data.token);
       },
     }
   );
@@ -30,16 +37,24 @@ export default function Login() {
   const handleSubmit = (event: React.FormEvent<LoginFormElement>) => {
     event.preventDefault();
     const { login, password } = event.currentTarget.elements;
-    loginMutation.mutate({ login: login.value, password: password.value });
+    mutate({ login: login.value, password: password.value });
   };
 
   return (
     <Wrapper>
       <h2>Welcome again!</h2>
-      <FormWrapper onSubmit={handleSubmit}>
-        <Input htmlFor="login" name="login" />
-        <Input htmlFor="password" type="password" name="password" />
-        <Button type="submit">Sign in</Button>
+      <FormWrapper noValidate onSubmit={handleSubmit}>
+        <Input htmlFor="login" name="login" placeholder="user123" minLength={6} />
+        <Input
+          htmlFor="password"
+          type="password"
+          name="password"
+          placeholder="password"
+          minLength={6}
+        />
+        <Button disabled={isLoading} type="submit">
+          Sign in
+        </Button>
       </FormWrapper>
     </Wrapper>
   );

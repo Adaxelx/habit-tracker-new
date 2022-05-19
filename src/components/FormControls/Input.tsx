@@ -29,4 +29,8 @@ const NativeInput = styled.input`
   background-color: ${({ theme }) => theme.colors.grays[900]};
   border: none;
   padding: ${({ theme }) => `0 ${theme.spacing[16]}`};
+
+  &:invalid {
+    border: 1px solid red;
+  }
 `;
