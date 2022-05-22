@@ -1,55 +1,79 @@
 import 'react-calendar/dist/Calendar.css';
 
-import React from 'react';
+import React, { useState } from 'react';
 import RCalendar, { CalendarTileProperties } from 'react-calendar';
+import { dateFormat } from 'consts';
 import dayjs from 'dayjs';
 import styled from 'styled-components';
 
 import useCalendar from './useCalendar';
 
+const getStartDate = (date: Date) => {
+  let newDate = dayjs(date).startOf('M');
+  const day = newDate.day();
+  if (day !== 1) {
+    const daysFromSundayToMondayBack = 6;
+    const diff = day === 0 ? daysFromSundayToMondayBack : day - 1;
+    newDate = newDate.subtract(diff, 'day');
+  }
+  return newDate.format(dateFormat);
+};
+const getEndDate = (date: Date) => {
+  let newDate = dayjs(date).endOf('M');
+  if (newDate.day() !== 0) {
+    const diff = 7 - newDate.day();
+    newDate = newDate.add(diff, 'day');
+  }
+  return newDate.format(dateFormat);
+};
+
 export default function Calendar() {
-  const from = '2022-05-01';
-  const to = '2022-05-31';
-  const calendarQuery = useCalendar({ from, to });
+  const [activeDate, setActiveDate] = useState(new Date());
+  const [navigationDate, setNavigationDate] = useState(new Date());
+
+  const calendarQuery = useCalendar({
+    from: getStartDate(navigationDate),
+    to: getEndDate(navigationDate),
+  });
 
   return (
     <Wrapper>
       <RCalendar
         locale="en-EN"
-        onChange={() => console.log('xd')}
-        value={new Date()}
-        tileContent={props => (
-          <Tile
-            {...props}
-            color={
-              calendarQuery.data?.events.find(event =>
-                calendarQuery.data?.daysConnectedWithEvents[dayjs(props.date).date()].includes(
-                  event._id
-                )
-              )?.label?.color
-            }
-          />
-        )}
+        value={activeDate}
+        onChange={(newDate: Date) => setActiveDate(newDate)}
+        activeStartDate={navigationDate}
+        onActiveStartDateChange={({ activeStartDate }) => {
+          setNavigationDate(activeStartDate);
+        }}
+        tileContent={props => {
+          return (
+            <>
+              {calendarQuery?.data?.[dayjs(props.date).format(dateFormat)]?.map((color, index) => (
+                <Tile {...props} color={color} key={index} index={index} />
+              ))}
+            </>
+          );
+        }}
       />
     </Wrapper>
   );
 }
 
-const Tile = (props: CalendarTileProperties & { color?: string }) => {
+const Tile = (props: CalendarTileProperties & { color?: string; index?: number }) => {
   if (props.view !== 'month') return null;
-  return <Dot color={props.color || '#ffffff'} />;
+  return <Dot color={props.color} />;
 };
 
 const Dot = styled.div`
-  --dotDimension: 40px;
+  --dotDimension: 8px;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0%;
+  left: 3px;
   width: var(--dotDimension);
   height: var(--dotDimension);
   background-color: ${({ color }) => color};
-  z-index: -1;
+  z-index: 22;
   border-radius: 9999px;
 `;
 

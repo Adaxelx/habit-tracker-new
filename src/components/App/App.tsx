@@ -3,7 +3,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { createWebStoragePersister } from 'react-query/createWebStoragePersister';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import { persistQueryClient } from 'react-query/persistQueryClient';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
@@ -52,11 +54,20 @@ const queryClient = new QueryClient({
         return client(url);
       },
       onError,
+      staleTime: 1000 * 60 * 5,
+      cacheTime: 1000 * 60 * 60 * 24,
     },
     mutations: {
       onError,
     },
   },
+});
+
+const localStoragePersistor = createWebStoragePersister({ storage: window.localStorage });
+
+persistQueryClient({
+  queryClient,
+  persister: localStoragePersistor,
 });
 
 function App() {

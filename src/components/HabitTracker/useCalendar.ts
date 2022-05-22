@@ -1,13 +1,13 @@
 import { useQuery } from 'react-query';
+import { dateFormat } from 'consts';
 import dayjs from 'dayjs';
-import { range } from 'utils';
 
-export interface LabelSend {
+export interface LabelProperties {
   title: string;
   color: string;
 }
 
-export interface Label extends LabelSend {
+export interface Label extends LabelProperties {
   _id: string;
   userId: string;
 }
@@ -48,33 +48,34 @@ type UseCalendarProps = {
 };
 
 export default function useCalendar({ from, to }: UseCalendarProps) {
-  return useQuery<Event[], unknown, { events: Event[]; daysConnectedWithEvents: EventsMap }>(
-    ['events', { from, to }],
-    {
-      select: events => {
-        const daysConnectedWithEvents: EventsMap = range(1, 32).reduce(
-          (previousObject, key) => Object.assign(previousObject, { [key]: [] }),
-          {}
-        );
+  return useQuery<Event[], unknown, EventsMap>(['events', { from, to }], {
+    select: events => {
+      const daysConnectedWithEvents: EventsMap = {};
+      const fromDate = dayjs(from);
+      const toDate = dayjs(to);
 
-        events.forEach(event => {
-          const dateStart = dayjs(event.dateStart);
-          const dateEnd = dayjs(event.dateEnd);
-          const fromDate = dayjs(from);
-          const toDate = dayjs(to);
+      events.forEach(event => {
+        const dateStart = dayjs(event.dateStart);
+        const dateEnd = dayjs(event.dateEnd);
 
-          let startBorderDate = fromDate.isAfter(dateStart) ? fromDate : dateStart;
-          const endBorderDate = toDate.isBefore(dateEnd.add(1, 'day')) ? toDate : dateEnd;
+        let startBorderDate = fromDate.isAfter(dateStart) ? fromDate : dateStart;
+        const endBorderDate = toDate.isBefore(dateEnd.add(1, 'day')) ? toDate : dateEnd;
 
-          while (startBorderDate.isBefore(endBorderDate.add(1, 'day'))) {
-            if (event.daysOfWeek.includes(startBorderDate.day())) {
-              daysConnectedWithEvents[startBorderDate.date()].push(event._id);
+        while (startBorderDate.isBefore(endBorderDate.add(1, 'day'))) {
+          if (event.daysOfWeek.includes(startBorderDate.day())) {
+            const index = startBorderDate.format(dateFormat);
+            const labelColor = event.label ? event.label.color : '#000000';
+            if (Array.isArray(daysConnectedWithEvents[index])) {
+              daysConnectedWithEvents[index].push(labelColor);
+            } else {
+              daysConnectedWithEvents[index] = [labelColor];
             }
-            startBorderDate = startBorderDate.add(1, 'day');
           }
-        });
-        return { daysConnectedWithEvents, events };
-      },
-    }
-  );
+          startBorderDate = startBorderDate.add(1, 'day');
+        }
+      });
+
+      return daysConnectedWithEvents;
+    },
+  });
 }
