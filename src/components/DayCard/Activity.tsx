@@ -1,14 +1,8 @@
 import styled from 'styled-components';
 
-interface Props {
-  title: string;
-  timeStart: string;
-  timeEnd: string;
-  description: string;
-  checked: boolean;
-}
+import { Event } from './useCardContent';
 
-export default function Activity({ title, timeStart, timeEnd, description, checked }: Props) {
+export default function Activity({ title, timeStart, timeEnd, description }: Event) {
   return (
     <Wrapper>
       <MainContent>

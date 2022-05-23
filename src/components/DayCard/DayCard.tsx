@@ -1,45 +1,33 @@
-import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
 import styled from 'styled-components';
 
 import useFormattedMessage from 'hooks/useFormattedMessage';
 
 import Activity from './Activity';
+import { Event } from './useCardContent';
 
-const activities = [
-  {
-    title: 'Reading a book',
-    timeStart: '16:00',
-    timeEnd: '16:30',
-    description: 'Read a book for 30 minut every day as a good habit.',
-    checked: false,
-  },
-  {
-    title: 'Reading a book2',
-    timeStart: '16:00',
-    timeEnd: '16:30',
-    description: '',
-    checked: false,
-  },
-];
+interface DayCardProps {
+  date: string;
+  events: Event[];
+  className?: string;
+}
 
-const DayCard = ({ date }: { date: Date }) => {
+const DayCard = ({ date, events, className = '' }: DayCardProps) => {
   const dayjsDate = dayjs(date);
   const day = dayjsDate.date();
   const dayOfWeek = dayjsDate.day();
   const month = dayjsDate.month();
   const year = dayjsDate.year();
 
-  // const queryInfo = useQuery(['labels']);
   const formatDayOfWeek = useFormattedMessage(`calendar.dayOfWeek.${dayOfWeek}`);
 
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <Date>{`${day} ${month} ${year}`}</Date>
       <h5>{formatDayOfWeek}</h5>
       <ActivityWrapper>
         <Line />
-        {activities.map(event => (
+        {events.map(event => (
           <Activity {...event} key={event.title} />
         ))}
       </ActivityWrapper>
@@ -55,7 +43,7 @@ const Wrapper = styled.section`
   align-items: center;
   padding: ${({ theme }) => `${theme.spacing[24]} ${theme.spacing[16]} 0`};
   width: 100%;
-  max-width: 340px;
+  min-width: 300px;
   height: 600px;
   border-radius: ${({ theme }) => theme.cornerRadius.regular};
   background-color: ${({ theme }) => theme.colors.grays[1000]};

@@ -6,26 +6,9 @@ import { dateFormat } from 'consts';
 import dayjs from 'dayjs';
 import styled from 'styled-components';
 
-import useCalendar from './useCalendar';
+import { getEndDate, getStartDate } from 'helpers/calendar';
 
-const getStartDate = (date: Date) => {
-  let newDate = dayjs(date).startOf('M');
-  const day = newDate.day();
-  if (day !== 1) {
-    const daysFromSundayToMondayBack = 6;
-    const diff = day === 0 ? daysFromSundayToMondayBack : day - 1;
-    newDate = newDate.subtract(diff, 'day');
-  }
-  return newDate.format(dateFormat);
-};
-const getEndDate = (date: Date) => {
-  let newDate = dayjs(date).endOf('M');
-  if (newDate.day() !== 0) {
-    const diff = 7 - newDate.day();
-    newDate = newDate.add(diff, 'day');
-  }
-  return newDate.format(dateFormat);
-};
+import useCalendar from './useCalendar';
 
 export default function Calendar() {
   const [activeDate, setActiveDate] = useState(new Date());
