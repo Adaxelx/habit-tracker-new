@@ -1,6 +1,6 @@
 import 'react-calendar/dist/Calendar.css';
 
-import React, { useState } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import RCalendar, { CalendarTileProperties } from 'react-calendar';
 import { dateFormat } from 'consts';
 import dayjs from 'dayjs';
@@ -10,8 +10,12 @@ import { getEndDate, getStartDate } from 'helpers/calendar';
 
 import useCalendar from './useCalendar';
 
-export default function Calendar() {
-  const [activeDate, setActiveDate] = useState(new Date());
+interface CalendarProps {
+  activeDate: Date;
+  setActiveDate: Dispatch<SetStateAction<Date>>;
+}
+
+export default function Calendar({ activeDate, setActiveDate }: CalendarProps) {
   const [navigationDate, setNavigationDate] = useState(new Date());
 
   const calendarQuery = useCalendar({
@@ -63,7 +67,7 @@ const Dot = styled.div`
 const Wrapper = styled.div`
   .react-calendar {
     border-radius: 8px;
-    filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+    filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.25));
     padding: ${({ theme }) => theme.spacing[32]};
     margin: 0;
     background-color: ${({ theme }) => theme.colors.grays[1000]};

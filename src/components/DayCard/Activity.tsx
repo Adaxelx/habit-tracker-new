@@ -1,16 +1,22 @@
+import { check } from 'prettier';
 import styled from 'styled-components';
+
+import Checkbox from 'components/FormControls/Checkbox';
 
 import { Event } from './useCardContent';
 
-export default function Activity({ title, timeStart, timeEnd, description }: Event) {
+export default function Activity({ title, timeStart, timeEnd, description, checked }: Event) {
   return (
     <Wrapper>
       <MainContent>
-        <Subtext>{`${timeStart} - ${timeEnd}`}</Subtext>
         <h5>{title}</h5>
+        <Subtext>{`${timeStart} - ${timeEnd}`}</Subtext>
         <Subtext>{description}</Subtext>
       </MainContent>
-      <Aside></Aside>
+      <Aside>
+        <Checkbox />
+        <Badge />
+      </Aside>
     </Wrapper>
   );
 }
@@ -33,6 +39,7 @@ const MainContent = styled.section`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing[4]};
+  flex-grow: 1;
 `;
 
 const Subtext = styled.p`
@@ -44,6 +51,8 @@ const Aside = styled.aside`
   display: flex;
   flex-direction: column;
   width: 32px; // tmp
+  gap: ${({ theme }) => theme.spacing[12]};
+  align-items: center;
 `;
 
 // const Divider = styled.div`
@@ -51,3 +60,11 @@ const Aside = styled.aside`
 //   height: 100%;
 //   background-color: ${({ theme }) => theme.colors.grays[800]};
 // `;
+
+const Badge = styled.div`
+  --size: ${({ theme }) => theme.spacing[24]};
+  width: var(--size);
+  height: var(--size);
+  background-color: ${({ theme }) => theme.colors.grays[800]};
+  border-radius: ${({ theme }) => theme.cornerRadius.small};
+`;

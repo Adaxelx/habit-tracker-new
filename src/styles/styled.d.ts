@@ -9,6 +9,7 @@ declare module 'styled-components' {
     };
     cornerRadius: {
       regular: string;
+      small: string;
     };
     fontSizes: Record<FontSizes, string>;
     spacing: Record<Spacing, string>;

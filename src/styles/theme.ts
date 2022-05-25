@@ -21,6 +21,7 @@ export const theme: DefaultTheme = {
   },
   cornerRadius: {
     regular: '8px',
+    small: '4px',
   },
   fontSizes: {
     48: rem(48),

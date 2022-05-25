@@ -1,3 +1,4 @@
+import { dateFormat } from 'consts';
 import dayjs from 'dayjs';
 import styled from 'styled-components';
 
@@ -22,7 +23,7 @@ const DayCard = ({ date, events, className = '' }: DayCardProps) => {
   const formatDayOfWeek = useFormattedMessage(`calendar.dayOfWeek.${dayOfWeek}`);
 
   return (
-    <Wrapper className={className}>
+    <Wrapper className={className} id={`dayCard:${dayjsDate.format(dateFormat)}`}>
       <Date>{`${day} ${month} ${year}`}</Date>
       <h5>{formatDayOfWeek}</h5>
       <ActivityWrapper>
@@ -48,6 +49,11 @@ const Wrapper = styled.section`
   border-radius: ${({ theme }) => theme.cornerRadius.regular};
   background-color: ${({ theme }) => theme.colors.grays[1000]};
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+
+  transition: 300ms;
+  &:focus-within {
+    box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.25);
+  }
 `;
 
 const Date = styled.p`

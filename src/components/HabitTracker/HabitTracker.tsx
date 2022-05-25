@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import Calendar from './Calendar';
 import DayCardWrapper from './DayCardWrapper';
 
 export default function HabitTracker() {
+  const [activeDate, setActiveDate] = useState(new Date());
   return (
     <Wrapper>
-      <Calendar />
-      <DayCardWrapper />
+      <Calendar activeDate={activeDate} setActiveDate={setActiveDate} />
+      <DayCardWrapper activeDate={activeDate} />
     </Wrapper>
   );
 }

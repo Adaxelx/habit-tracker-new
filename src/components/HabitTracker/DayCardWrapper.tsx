@@ -1,23 +1,39 @@
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { useQuery } from 'react-query';
 import { dateFormat } from 'consts';
 import dayjs from 'dayjs';
 import styled from 'styled-components';
 
 import DayCard from 'components/DayCard';
+import { getEndDate, getStartDate } from 'helpers/calendar';
 
 import { Event } from './useCalendar';
 
 type EventsMap = Record<string, Event[]>;
 
-export default function DayCardWrapper() {
-  const from = '2022-04-25';
-  const to = '2022-06-05';
+interface DayCardWrapperProps {
+  activeDate: Date;
+}
+
+function generateDefaultDateMap<ValueType>({ from, to }: { from: string; to: string }) {
+  const dateMap: Record<string, ValueType[]> = {};
+  let fromDate = dayjs(from);
+  const toDate = dayjs(to);
+  while (fromDate.isBefore(toDate.add(1, 'day'))) {
+    dateMap[fromDate.format(dateFormat)] = [];
+    fromDate = fromDate.add(1, 'day');
+  }
+  return dateMap;
+}
+
+export default function DayCardWrapper({ activeDate }: DayCardWrapperProps) {
+  const from = getStartDate(activeDate);
+  const to = getEndDate(activeDate);
 
   // Very similar to useCalendarContent hook
   const query = useQuery<Event[], unknown, EventsMap>(['events', { from, to }], {
     select: events => {
-      const daysConnectedWithEvents: EventsMap = {};
+      const daysConnectedWithEvents = generateDefaultDateMap<Event>({ from, to });
       const fromDate = dayjs(from);
       const toDate = dayjs(to);
 
@@ -44,13 +60,13 @@ export default function DayCardWrapper() {
       return daysConnectedWithEvents;
     },
   });
-
   if (!query.data) return null;
-  return <View data={query.data} />;
+  return <View data={query.data} activeDate={activeDate} />;
 }
 
-function View({ data }: { data: EventsMap }) {
-  const ref = useScrollHorizontalToCenter();
+function View({ data, activeDate }: { data: EventsMap; activeDate: Date }) {
+  const ref = useScrollHorizontalToCenter(data);
+  useScrollActiveCardToCenter(activeDate, ref);
   return (
     <Wrapper ref={ref}>
       {Object.entries(data).map(([date, events]) => (
@@ -60,22 +76,34 @@ function View({ data }: { data: EventsMap }) {
   );
 }
 
-function useScrollHorizontalToCenter() {
+function useScrollActiveCardToCenter(
+  activeDate: Date,
+  wrapperRef: React.MutableRefObject<HTMLElement | null>
+) {
+  useLayoutEffect(() => {
+    if (!wrapperRef.current) return;
+    document
+      ?.getElementById(`dayCard:${dayjs(activeDate).format(dateFormat)}`)
+      ?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'center' });
+  }, [activeDate, wrapperRef]);
+}
+
+function useScrollHorizontalToCenter(refreshKey: unknown) {
   const wrapper = useRef<HTMLElement | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!wrapper.current) return;
     const offsetLeft = wrapper.current?.offsetLeft;
     const width = wrapper.current?.scrollWidth / 2;
     wrapper.current.scrollTo({ left: offsetLeft + width, top: 0 });
-  }, []);
+  }, [refreshKey]);
 
   return wrapper;
 }
 
 const Wrapper = styled.section`
   overflow-x: scroll;
-
+  padding-bottom: ${({ theme }) => theme.spacing[16]};
   width: 100%;
   display: flex;
   gap: ${({ theme }) => theme.spacing[16]};
