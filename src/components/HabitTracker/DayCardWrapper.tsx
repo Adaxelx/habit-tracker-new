@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useQuery } from 'react-query';
 import { dateFormat } from 'consts';
 import dayjs from 'dayjs';
@@ -60,18 +60,32 @@ export default function DayCardWrapper({ activeDate }: DayCardWrapperProps) {
       return daysConnectedWithEvents;
     },
   });
+  const refreshKey = useMemo(() => ({ from, to }), [from, to]);
   if (!query.data) return null;
-  return <View data={query.data} activeDate={activeDate} />;
+
+  return <View data={query.data} refreshKey={refreshKey} activeDate={activeDate} />;
 }
 
-function View({ data, activeDate }: { data: EventsMap; activeDate: Date }) {
-  const ref = useScrollHorizontalToCenter(data);
+interface ViewProps {
+  data: EventsMap;
+  activeDate: Date;
+  refreshKey: { from: string; to: string };
+}
+
+function View({ data, activeDate, refreshKey }: ViewProps) {
+  const ref = useScrollHorizontalToCenter(refreshKey);
   useScrollActiveCardToCenter(activeDate, ref);
   return (
     <Wrapper ref={ref}>
-      {Object.entries(data).map(([date, events]) => (
-        <DayCardWithScroll date={date} events={events} />
-      ))}
+      {Object.entries(data).map(([date, events]) => {
+        return (
+          <DayCardWithScroll
+            date={date}
+            isActive={dayjs(activeDate).isSame(dayjs(date))}
+            events={events}
+          />
+        );
+      })}
     </Wrapper>
   );
 }
@@ -81,10 +95,14 @@ function useScrollActiveCardToCenter(
   wrapperRef: React.MutableRefObject<HTMLElement | null>
 ) {
   useLayoutEffect(() => {
-    if (!wrapperRef.current) return;
-    document
-      ?.getElementById(`dayCard:${dayjs(activeDate).format(dateFormat)}`)
-      ?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'center' });
+    const cardElement = document?.getElementById(`dayCard:${dayjs(activeDate).format(dateFormat)}`);
+    if (!wrapperRef.current || !cardElement) return;
+    const centerOfCard = cardElement.offsetLeft - window.innerWidth / 2;
+    wrapperRef.current?.scrollTo({
+      top: 0,
+      left: centerOfCard,
+      behavior: 'smooth',
+    });
   }, [activeDate, wrapperRef]);
 }
 
@@ -108,6 +126,10 @@ const Wrapper = styled.section`
   display: flex;
   gap: ${({ theme }) => theme.spacing[16]};
   scroll-snap-type: x mandatory;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const DayCardWithScroll = styled(DayCard)`

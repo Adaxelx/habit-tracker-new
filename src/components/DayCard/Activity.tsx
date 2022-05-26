@@ -1,29 +1,68 @@
-import { check } from 'prettier';
+import { useMutation, useQueryClient } from 'react-query';
 import styled from 'styled-components';
+import { client } from 'utils';
 
 import Checkbox from 'components/FormControls/Checkbox';
+import { getEndDate, getStartDate } from 'helpers/calendar';
 
 import { Event } from './useCardContent';
 
-export default function Activity({ title, timeStart, timeEnd, description, checked }: Event) {
+type DateTuple = [number, number, number];
+
+type ActivityProps = Omit<Event, 'checked'> & { checked: boolean; date: DateTuple };
+
+export default function Activity({
+  title,
+  timeStart,
+  timeEnd,
+  description,
+  checked,
+  date,
+  _id,
+}: ActivityProps) {
+  const mutation = useToggleChecked({ id: _id, date });
+
   return (
-    <Wrapper>
+    <Wrapper
+      onClick={() => {
+        mutation.mutate();
+      }}
+    >
       <MainContent>
         <h5>{title}</h5>
         <Subtext>{`${timeStart} - ${timeEnd}`}</Subtext>
         <Subtext>{description}</Subtext>
       </MainContent>
       <Aside>
-        <Checkbox />
+        <Checkbox checked={checked} />
         <Badge />
       </Aside>
     </Wrapper>
   );
 }
 
+interface UseToggleCheckedProps {
+  id: string;
+  date: DateTuple;
+}
+
+function useToggleChecked({ id, date }: UseToggleCheckedProps) {
+  const [year, month, day] = date;
+  const dateValue = `${year} ${month + 1} ${day}`;
+  const queryClient = useQueryClient();
+  return useMutation(() => client(`/events/check/${id}`, { body: date, method: 'PATCH' }), {
+    onSuccess: () => {
+      return queryClient.invalidateQueries([
+        'events',
+        { from: getStartDate(new Date(dateValue)), to: getEndDate(new Date(dateValue)) },
+      ]);
+    },
+  });
+}
+
 const Wrapper = styled.article`
   position: relative;
-
+  cursor: pointer;
   width: 100%;
   background-color: ${({ theme }) => theme.colors.grays[900]};
   height: 140px;

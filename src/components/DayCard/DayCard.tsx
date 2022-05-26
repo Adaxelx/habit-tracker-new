@@ -11,9 +11,10 @@ interface DayCardProps {
   date: string;
   events: Event[];
   className?: string;
+  isActive: boolean;
 }
 
-const DayCard = ({ date, events, className = '' }: DayCardProps) => {
+const DayCard = ({ date, events, className = '', isActive }: DayCardProps) => {
   const dayjsDate = dayjs(date);
   const day = dayjsDate.date();
   const dayOfWeek = dayjsDate.day();
@@ -23,13 +24,29 @@ const DayCard = ({ date, events, className = '' }: DayCardProps) => {
   const formatDayOfWeek = useFormattedMessage(`calendar.dayOfWeek.${dayOfWeek}`);
 
   return (
-    <Wrapper className={className} id={`dayCard:${dayjsDate.format(dateFormat)}`}>
+    <Wrapper
+      className={className}
+      id={`dayCard:${dayjsDate.format(dateFormat)}`}
+      isActive={isActive}
+    >
       <Date>{`${day} ${month} ${year}`}</Date>
       <h5>{formatDayOfWeek}</h5>
       <ActivityWrapper>
         <Line />
         {events.map(event => (
-          <Activity {...event} key={event.title} />
+          <Activity
+            {...event}
+            key={event.title}
+            date={[year, month, day]}
+            checked={Boolean(
+              event.checked?.some(
+                checkedEvent =>
+                  checkedEvent.day === day &&
+                  checkedEvent.month === month &&
+                  checkedEvent.year === year
+              )
+            )}
+          />
         ))}
       </ActivityWrapper>
     </Wrapper>
@@ -38,7 +55,11 @@ const DayCard = ({ date, events, className = '' }: DayCardProps) => {
 
 export default DayCard;
 
-const Wrapper = styled.section`
+interface WrapperProps {
+  isActive: boolean;
+}
+
+const Wrapper = styled.section<WrapperProps>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -48,8 +69,8 @@ const Wrapper = styled.section`
   height: 600px;
   border-radius: ${({ theme }) => theme.cornerRadius.regular};
   background-color: ${({ theme }) => theme.colors.grays[1000]};
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-
+  box-shadow: ${({ isActive }) =>
+    `0px ${isActive ? 8 : 4}px ${isActive ? 8 : 4}px rgba(0, 0, 0, 0.25);`}
   transition: 300ms;
   &:focus-within {
     box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.25);

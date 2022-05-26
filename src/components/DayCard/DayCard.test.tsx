@@ -21,6 +21,7 @@ const events = [
 const props = {
   date: `05/${mondayDate}/2022`,
   events,
+  isActive: false,
 };
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
