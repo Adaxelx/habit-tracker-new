@@ -1,11 +1,11 @@
 import { dateFormat } from 'consts';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import styled from 'styled-components';
 
 import useFormattedMessage from 'hooks/useFormattedMessage';
 
 import Activity from './Activity';
-import { Event } from './useCardContent';
+import { Checked, Event } from './useCardContent';
 
 interface DayCardProps {
   date: string;
@@ -13,6 +13,18 @@ interface DayCardProps {
   className?: string;
   isActive: boolean;
 }
+
+const getIsChecked = (checked: Checked[] | undefined, date: Dayjs) => {
+  const day = date.date();
+  const month = date.month();
+  const year = date.year();
+  return Boolean(
+    checked?.some(
+      checkedEvent =>
+        checkedEvent.day === day && checkedEvent.month === month && checkedEvent.year === year
+    )
+  );
+};
 
 const DayCard = ({ date, events, className = '', isActive }: DayCardProps) => {
   const dayjsDate = dayjs(date);
@@ -29,7 +41,7 @@ const DayCard = ({ date, events, className = '', isActive }: DayCardProps) => {
       id={`dayCard:${dayjsDate.format(dateFormat)}`}
       isActive={isActive}
     >
-      <Date>{`${day} ${month} ${year}`}</Date>
+      <Date>{new Intl.DateTimeFormat('en-GB').format(dayjsDate.toDate())}</Date>
       <h5>{formatDayOfWeek}</h5>
       <ActivityWrapper>
         <Line />
@@ -38,14 +50,7 @@ const DayCard = ({ date, events, className = '', isActive }: DayCardProps) => {
             {...event}
             key={event.title}
             date={[year, month, day]}
-            checked={Boolean(
-              event.checked?.some(
-                checkedEvent =>
-                  checkedEvent.day === day &&
-                  checkedEvent.month === month &&
-                  checkedEvent.year === year
-              )
-            )}
+            checked={getIsChecked(event.checked, dayjsDate)}
           />
         ))}
       </ActivityWrapper>

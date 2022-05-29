@@ -3,6 +3,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import React from 'react';
 import { IntlProvider } from 'react-intl';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { MutationCache } from 'react-query';
 import { createWebStoragePersister } from 'react-query/createWebStoragePersister';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import { persistQueryClient } from 'react-query/persistQueryClient';
@@ -46,6 +47,42 @@ const onError = (err: unknown) => {
   showToast(error.message, { type: 'error' });
 };
 
+const mutationCache = new MutationCache({
+  onError: error => {
+    console.log(error);
+  },
+  onSuccess: data => {
+    console.log(data);
+  },
+});
+
+mutationCache.subscribe(mutation => {
+  const filtered = mutationCache.getAll().filter(prevMutation => {
+    if (
+      Array.isArray(
+        (prevMutation?.state?.variables as unknown as { date: [string, string, string] })?.date
+      ) &&
+      Array.isArray(mutation?.mutation?.state?.variables?.date)
+    ) {
+      const [mYear, mMonth, mDay] = (
+        prevMutation?.state?.variables as unknown as { date: [string, string, string] }
+      )?.date;
+      const [year, month, day] = mutation?.mutation?.state?.variables?.date;
+      return (
+        year === mYear &&
+        mMonth === month &&
+        mDay === day &&
+        mutation.mutation.mutationId !== prevMutation.mutationId
+      );
+    }
+    return false;
+  });
+
+  filtered.forEach(mutation => {
+    mutationCache.remove(mutation);
+  });
+});
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -61,6 +98,7 @@ const queryClient = new QueryClient({
       onError,
     },
   },
+  mutationCache,
 });
 
 const localStoragePersistor = createWebStoragePersister({ storage: window.localStorage });

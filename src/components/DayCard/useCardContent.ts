@@ -30,15 +30,15 @@ export interface Event extends EventInterface {
   _id: string;
   userId: string;
   label?: Label;
-  checked?: [
-    {
-      day: number;
-      month: number;
-      year: number;
-      _id: string;
-    }
-  ];
+  checked?: Checked[];
 }
+
+export type Checked = {
+  day: number;
+  month: number;
+  year: number;
+  _id: string;
+};
 
 type EventsMap = Record<string, string[]>;
 

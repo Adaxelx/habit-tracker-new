@@ -1,3 +1,4 @@
 import calendar from './calendar';
+import habitTracker from './habitTracker';
 
-export default { calendar };
+export default { calendar, habitTracker };

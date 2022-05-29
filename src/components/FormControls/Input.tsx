@@ -1,17 +1,19 @@
-import { InputHTMLAttributes } from 'react';
+import { Fragment, InputHTMLAttributes } from 'react';
 import VisuallyHidden from '@reach/visually-hidden';
 import styled from 'styled-components';
 
 export default function Input({
   htmlFor,
   name,
+  showLabel = false,
   ...rest
-}: InputHTMLAttributes<HTMLInputElement> & { htmlFor: string }) {
+}: InputHTMLAttributes<HTMLInputElement> & { htmlFor: string; showLabel?: boolean }) {
+  const LabelWrapper = showLabel ? Fragment : VisuallyHidden;
   return (
     <Wrapper>
-      <VisuallyHidden>
+      <LabelWrapper>
         <label htmlFor={htmlFor}>{name}</label>
-      </VisuallyHidden>
+      </LabelWrapper>
       <NativeInput id={htmlFor} name={name} {...rest} />
     </Wrapper>
   );
@@ -19,6 +21,9 @@ export default function Input({
 
 const Wrapper = styled.div`
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
 
 const NativeInput = styled.input`
