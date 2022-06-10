@@ -1,14 +1,11 @@
-import { useEffect } from 'react';
-import { QueryClient, useMutation, useQueryClient } from 'react-query';
 import styled from 'styled-components';
-import { client } from 'utils';
 
 import Checkbox from 'components/FormControls/Checkbox';
-import { getEndDate, getStartDate } from 'helpers/calendar';
 
 import { Event } from './useCardContent';
+import useToggleChecked from './useToggleChecked';
 
-type DateTuple = [number, number, number];
+export type DateTuple = [number, number, number];
 
 type ActivityProps = Omit<Event, 'checked'> & { checked: boolean; date: DateTuple };
 
@@ -40,83 +37,6 @@ export default function Activity({
       </Aside>
     </Wrapper>
   );
-}
-
-interface UseToggleCheckedProps {
-  id: string;
-  checked: boolean;
-  date: DateTuple;
-}
-
-function useToggleChecked({ id, date, checked }: UseToggleCheckedProps) {
-  const [year, month, day] = date;
-  const dateValue = `${year} ${month + 1} ${day}`;
-  const queryClient = useQueryClient();
-
-  const eventCacheKey = [
-    'events',
-    { from: getStartDate(new Date(dateValue)), to: getEndDate(new Date(dateValue)) },
-  ];
-  const mutation = useMutation<unknown, unknown, { id: string; date: DateTuple; check: boolean }>(
-    ({ id, date, check }) =>
-      client(`/events/check/${id}`, { body: { date, check }, method: 'PATCH' }),
-    {
-      onSuccess: (data, variables, restoreCache) => {
-        (restoreCache as () => void)?.();
-        return queryClient.invalidateQueries(eventCacheKey);
-      },
-      onMutate: () => {
-        const savedCache = queryClient.getQueriesData(eventCacheKey);
-        if (!savedCache) return;
-        const idCheck = (Math.random() * 999).toString();
-        queryClient.setQueryData<Event[]>(eventCacheKey, currentEvents => {
-          const wasChecked = currentEvents
-            ?.find(event => event._id === id)
-            ?.checked?.find(
-              check => check.day === day && check.month === month && check.year === year
-            );
-          return (currentEvents ?? []).map(event =>
-            event._id === id
-              ? {
-                  ...event,
-                  checked: wasChecked
-                    ? event?.checked?.filter(check => check._id !== wasChecked._id)
-                    : [
-                        ...(event?.checked ?? []),
-                        { _id: (Math.random() * 999).toString(), day, month, year },
-                      ],
-                }
-              : event
-          );
-        });
-        return () => {
-          queryClient.setQueryData<Event[]>(eventCacheKey, currentEvents => {
-            const wasChecked = currentEvents
-              ?.find(event => event._id === id)
-              ?.checked?.find(
-                check => check.day === day && check.month === month && check.year === year
-              );
-
-            return (currentEvents ?? []).map(event =>
-              event._id === id
-                ? {
-                    ...event,
-                    checked: !wasChecked
-                      ? event?.checked?.filter(check => check._id !== idCheck)
-                      : [...(event?.checked ?? []), wasChecked],
-                  }
-                : event
-            );
-          });
-        };
-      },
-      onError: (data, variables, restoreCache) => {
-        (restoreCache as () => void)?.();
-      },
-    }
-  );
-
-  return { ...mutation, mutate: () => mutation.mutate({ id, date, check: !checked }) };
 }
 
 const Wrapper = styled.article`

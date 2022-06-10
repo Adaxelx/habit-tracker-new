@@ -1,12 +1,13 @@
 import React from 'react';
 import { useMutation } from 'react-query';
-import { useNavigate } from 'react-router-dom';
-import { tokenKey } from 'consts';
+import { Navigate, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { client } from 'utils';
 
 import Button from 'components/Button';
 import { Input } from 'components/FormControls';
+
+import { useUser } from './UserContext';
 
 interface FormElements extends HTMLFormControlsCollection {
   login: HTMLInputElement;
@@ -24,15 +25,20 @@ type MutationData = { login: string; password: string };
 
 export default function Login() {
   const navigate = useNavigate();
+  const { dispatch, state } = useUser();
   const { isLoading, mutate } = useMutation<LoginData, any, MutationData>(
     credentials => client('/users/login', { body: credentials }),
     {
       onSuccess: data => {
-        navigate('/calendar');
-        window.localStorage.setItem(tokenKey, data.token);
+        navigate('/habit-tracker');
+        dispatch({ type: 'login', payload: { token: data.token } });
       },
     }
   );
+
+  if (state.token) {
+    return <Navigate to="/habit-tracker" replace />;
+  }
 
   const handleSubmit = (event: React.FormEvent<LoginFormElement>) => {
     event.preventDefault();

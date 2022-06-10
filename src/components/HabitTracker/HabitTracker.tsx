@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { useUser } from 'components/Account/UserContext';
 import Button from 'components/Button';
 import useFormattedMessage from 'hooks/useFormattedMessage';
 
@@ -11,8 +13,12 @@ import EventForm from './EventForm';
 export default function HabitTracker() {
   const [activeDate, setActiveDate] = useState(new Date());
   const addHabitButton = useFormattedMessage('habitTracker.addHabitButton');
-
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const { state } = useUser();
+
+  if (!state.token) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <Wrapper>

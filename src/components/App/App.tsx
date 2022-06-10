@@ -20,6 +20,7 @@ import { client, generateUrlFromQueryKey } from 'utils';
 
 // import DayCard from 'components/DayCard';
 import { Login, Register } from 'components/Account';
+import { UserProvider } from 'components/Account/UserContext';
 import HabitTracker from 'components/HabitTracker';
 import ToastContainer, { showToast } from 'components/ToastContainer';
 
@@ -113,16 +114,18 @@ function App() {
     <IntlProvider locale={locale.EN} messages={flattenMessages(messages[locale.EN])}>
       <ThemeProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
-          <MergedGlobalStyles />
-          {/* <DayCard {...mockedDay} /> */}
-          <ToastContainer />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/habit-tracker" element={<HabitTracker />} />
-            </Routes>
-          </BrowserRouter>
+          <UserProvider>
+            <MergedGlobalStyles />
+            {/* <DayCard {...mockedDay} /> */}
+            <ToastContainer />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/habit-tracker" element={<HabitTracker />} />
+              </Routes>
+            </BrowserRouter>
+          </UserProvider>
           <ReactQueryDevtools />
         </QueryClientProvider>
       </ThemeProvider>
