@@ -106,3 +106,26 @@ export function client(endpoint: string, { body, ...customConfig }: any = {}) {
       }
     });
 }
+
+export function handleAddRemoveToggleInArray<T>(prevState: T[], product: T) {
+  const newState = [...prevState];
+  const index = newState.indexOf(product);
+  if (index === -1) {
+    newState.push(product);
+  } else {
+    newState.splice(index, 1);
+  }
+  return newState;
+}
+
+export const mongoObjectId = function () {
+  const timestamp = ((new Date().getTime() / 1000) | 0).toString(16);
+  return (
+    timestamp +
+    'xxxxxxxxxxxxxxxx'
+      .replace(/[x]/g, function () {
+        return ((Math.random() * 16) | 0).toString(16);
+      })
+      .toLowerCase()
+  );
+};

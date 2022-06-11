@@ -14,12 +14,11 @@ interface UseToggleCheckedProps {
 
 export default function useToggleChecked({ id, date, checked }: UseToggleCheckedProps) {
   const [year, month, day] = date;
-  const dateValue = `${year} ${month + 1} ${day}`;
   const queryClient = useQueryClient();
 
   const eventCacheKey = [
     'events',
-    { from: getStartDate(new Date(dateValue)), to: getEndDate(new Date(dateValue)) },
+    { from: getStartDate(new Date(year, month, day)), to: getEndDate(new Date(year, month, day)) },
   ];
   const mutation = useMutation<unknown, unknown, { id: string; date: DateTuple; check: boolean }>(
     ({ id, date, check }) =>

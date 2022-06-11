@@ -27,6 +27,7 @@ export default function Modal({ isOpen, onClose, children, title }: ModalProps) 
 
 const ModalWrapper = styled(Dialog)`
   &[data-reach-dialog-content] {
+    overflow: auto;
     --space: ${({ theme }) => theme.spacing[16]};
     border-radius: ${({ theme }) => theme.cornerRadius.regular};
     width: calc(100% - var(--space) * 2);

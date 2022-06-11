@@ -26,18 +26,17 @@ export interface EventSend extends EventInterface {
   label?: string;
 }
 
+type Check = {
+  day: number;
+  month: number;
+  year: number;
+  _id: string;
+};
 export interface Event extends EventInterface {
   _id: string;
   userId: string;
   label?: Label;
-  checked?: [
-    {
-      day: number;
-      month: number;
-      year: number;
-      _id: string;
-    }
-  ];
+  checked?: Check[];
 }
 
 type EventsMap = Record<string, string[]>;

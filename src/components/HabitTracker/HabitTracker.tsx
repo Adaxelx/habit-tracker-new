@@ -8,7 +8,7 @@ import useFormattedMessage from 'hooks/useFormattedMessage';
 
 import Calendar from './Calendar';
 import DayCardWrapper from './DayCardWrapper';
-import EventForm from './EventForm';
+import HabitForm from './HabitForm';
 
 export default function HabitTracker() {
   const [activeDate, setActiveDate] = useState(new Date());
@@ -25,7 +25,7 @@ export default function HabitTracker() {
       <Button onClick={() => setIsEventModalOpen(true)}>{addHabitButton}</Button>
       <Calendar activeDate={activeDate} setActiveDate={setActiveDate} />
       <DayCardWrapper activeDate={activeDate} />
-      <EventForm isOpen={isEventModalOpen} onClose={() => setIsEventModalOpen(false)} />
+      <HabitForm isOpen={isEventModalOpen} onClose={() => setIsEventModalOpen(false)} />
     </Wrapper>
   );
 }
