@@ -1,19 +1,16 @@
 import { useState } from 'react';
-import { useMutation, useQueryClient } from 'react-query';
-import dayjs, { Dayjs } from 'dayjs';
+import { useQuery } from 'react-query';
 import styled from 'styled-components';
-import { client, handleAddRemoveToggleInArray, mongoObjectId } from 'utils';
+import { handleAddRemoveToggleInArray, mongoObjectId } from 'utils';
 
-import { useUser } from 'components/Account/UserContext';
 import Button from 'components/Button';
 import { Input, TextArea } from 'components/FormControls';
 import Select, { DefaultOption } from 'components/FormControls/Select';
 import Modal from 'components/Modal';
-import { showToast } from 'components/ToastContainer';
 import useFormattedMessage from 'hooks/useFormattedMessage';
-import { getEndDate, getStartDate } from 'helpers/calendar';
 
-import { Event, EventInterface } from './useCalendar';
+import { EventInterface, Label } from './useCalendar';
+import useCreateHabit from './useCreateHabit';
 
 type FormElements = HTMLFormControlsCollection &
   Record<keyof Omit<EventInterface, 'daysOfWeek'>, HTMLInputElement>;
@@ -26,21 +23,6 @@ interface HabitFormProps {
   onClose: () => void;
 }
 
-const generateEventCacheKeys = (dateStart: Dayjs, dateEnd: Dayjs) => {
-  let currentMonth = dateStart;
-  const eventKeys = [];
-
-  while (currentMonth.month() <= dateEnd.month()) {
-    eventKeys.push([
-      'events',
-      { from: getStartDate(currentMonth.toDate()), to: getEndDate(currentMonth.toDate()) },
-    ]);
-    currentMonth = currentMonth.add(1, 'month');
-  }
-
-  return eventKeys;
-};
-
 const habitFormTranslations = 'habitTracker.habitForm';
 
 export default function HabitForm({ isOpen, onClose }: HabitFormProps) {
@@ -51,74 +33,21 @@ export default function HabitForm({ isOpen, onClose }: HabitFormProps) {
   const timeStart = useFormattedMessage(`${habitFormTranslations}.timeStart`);
   const timeEnd = useFormattedMessage(`${habitFormTranslations}.timeEnd`);
   const daysOfWeekTitle = useFormattedMessage(`${habitFormTranslations}.daysOfWeek`);
+  const labelTitle = useFormattedMessage(`${habitFormTranslations}.label`);
   const submit = useFormattedMessage(`${habitFormTranslations}.submit`);
-  const queryClient = useQueryClient();
-  const { state } = useUser();
+
   const [daysOfWeek, setDaysOfWeek] = useState<number[]>([]);
+  const [label, setLabel] = useState('');
 
-  const habitMutation = useMutation<unknown, unknown, EventInterface & { _id: string }>(
-    body => client('/events', { body }),
-    {
-      onSuccess: (_, variables, restoreCache) => {
-        (restoreCache as () => void)?.();
-        const eventCacheKeys = generateEventCacheKeys(
-          dayjs(variables.dateStart),
-          dayjs(variables.dateEnd)
-        );
-        const refetchOfEvents = eventCacheKeys.map(eventCacheKey =>
-          queryClient.invalidateQueries(eventCacheKey)
-        );
-        showToast('Successfuly added habit', { type: 'success' });
-        onClose();
-        return Promise.all(refetchOfEvents);
-      },
-      onMutate: variables => {
-        const userId = state?.token?.split?.(':')?.[1] ?? '';
-        const newEvent: Event = {
-          ...variables,
-          userId,
-          checked: [],
-        };
-        const eventCacheKeys = generateEventCacheKeys(
-          dayjs(variables.dateStart),
-          dayjs(variables.dateEnd)
-        );
+  const habitMutation = useCreateHabit(onClose);
 
-        const savedCache = eventCacheKeys.map(eventCacheKey =>
-          queryClient.getQueryData<Event[]>(eventCacheKey)
-        );
-
-        eventCacheKeys.forEach(eventCacheKey => {
-          const savedCache = queryClient.getQueryData<Event[]>(eventCacheKey);
-          if (!savedCache) return;
-          queryClient.setQueryData<Event[]>(eventCacheKey, currentEvents => {
-            return [...(currentEvents ?? []), newEvent];
-          });
-        });
-
-        if (!navigator.onLine) {
-          showToast('(Without internet) Succesfuly added habit', { type: 'success' });
-          onClose();
-        }
-
-        return () => {
-          eventCacheKeys.forEach((eventCacheKey, index) => {
-            queryClient.setQueryData<Event[]>(eventCacheKey, savedCache[index]);
-          });
-        };
-      },
-      onError: (data, variables, restoreCache) => {
-        // showToast(data?.error ?? 'Unknown error', { type: 'error' });
-        (restoreCache as () => void)?.();
-      },
-    }
-  );
+  const labels = useQuery<Label[]>(['labels']);
 
   const handleSubmit = (event: React.FormEvent<HabitFormElement>) => {
     event.preventDefault();
     const data = event.currentTarget.elements;
     const { timeStart, timeEnd, title, dateEnd, dateStart } = data;
-    console.log(generateEventCacheKeys(dayjs(dateStart.value), dayjs(dateEnd.value)));
+
     habitMutation.mutate({
       timeStart: timeStart.value,
       timeEnd: timeEnd.value,
@@ -126,6 +55,7 @@ export default function HabitForm({ isOpen, onClose }: HabitFormProps) {
       dateEnd: dateEnd.value,
       dateStart: dateStart.value,
       daysOfWeek,
+      label,
       _id: mongoObjectId(),
     });
   };
@@ -133,7 +63,13 @@ export default function HabitForm({ isOpen, onClose }: HabitFormProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={header}>
       <FormWrapper onSubmit={handleSubmit} id="habitForm">
-        <Input name="Title" htmlFor="title" defaultValue={'test'} placeholder={titlePlaceholder} />
+        <Input
+          name="Title"
+          htmlFor="title"
+          defaultValue={'test'}
+          placeholder={titlePlaceholder}
+          showLabel
+        />
         <TextArea
           name="Description"
           htmlFor="description"
@@ -165,6 +101,20 @@ export default function HabitForm({ isOpen, onClose }: HabitFormProps) {
           ))}
           label={daysOfWeekTitle}
         />
+        {labels.data ? (
+          <Select
+            options={labels.data.map(({ color, _id }) => (
+              <LabelOption
+                key={_id}
+                active={_id === label}
+                color={color}
+                onClick={() => setLabel(_id)}
+              />
+            ))}
+            selected={labels.data.find(({ _id }) => _id === label)?.title}
+            label={labelTitle}
+          />
+        ) : null}
         <Button type="submit">{submit}</Button>
       </FormWrapper>
     </Modal>
@@ -175,6 +125,14 @@ const FormWrapper = styled.form`
   display: flex;
   flex-direction: column;
   gap: 16px;
+`;
+
+interface LabelOptionProps {
+  color: string;
+}
+
+const LabelOption = styled(DefaultOption)<LabelOptionProps>`
+  background-color: ${({ color }) => color};
 `;
 
 const weekDays = [

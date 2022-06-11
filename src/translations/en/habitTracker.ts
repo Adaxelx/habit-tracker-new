@@ -1,5 +1,6 @@
 export default {
   addHabitButton: 'Add habit',
+  addLabelButton: 'Add label',
   habitForm: {
     header: 'Add your habit!',
     titlePlaceholder: 'Example title...',
@@ -8,6 +9,13 @@ export default {
     timeStart: 'Estimated time start',
     timeEnd: 'Estimated time end',
     daysOfWeek: 'Days to track',
+    label: 'Label',
     submit: 'Start habit!',
+  },
+  labelForm: {
+    header: 'Add new label',
+    colorLabel: 'Pick color for label',
+    titlePlaceholder: 'Example title',
+    submit: 'Send',
   },
 };

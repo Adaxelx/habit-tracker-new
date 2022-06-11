@@ -10,11 +10,12 @@ interface ModalProps {
   onClose: () => void;
   children: ReactNode;
   title?: string;
+  className?: string;
 }
 
-export default function Modal({ isOpen, onClose, children, title }: ModalProps) {
+export default function Modal({ isOpen, onClose, children, title, className }: ModalProps) {
   return (
-    <ModalWrapper isOpen={isOpen} onDismiss={onClose}>
+    <ModalWrapper isOpen={isOpen} onDismiss={onClose} className={className}>
       <CloseButton onClick={onClose}>
         <VisuallyHidden>Close</VisuallyHidden>
         <span aria-hidden>×</span>
@@ -31,7 +32,7 @@ const ModalWrapper = styled(Dialog)`
     --space: ${({ theme }) => theme.spacing[16]};
     border-radius: ${({ theme }) => theme.cornerRadius.regular};
     width: calc(100% - var(--space) * 2);
-    height: calc(100% - var(--space) * 2);
+    max-height: calc(100% - var(--space) * 2);
     margin: var(--space);
     display: flex;
     flex-direction: column;

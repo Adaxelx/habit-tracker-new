@@ -4,12 +4,16 @@ import styled from 'styled-components';
 interface SelectProps {
   options: ReactNode[];
   label: string;
+  selected?: string;
 }
 
-export default function Select({ options, label }: SelectProps) {
+export default function Select({ options, label, selected }: SelectProps) {
   return (
     <Wrapper>
-      <Label>{label}</Label>
+      <HeaderWrapper>
+        <Label>{label}</Label>
+        {selected ? <Selected>{selected}</Selected> : null}
+      </HeaderWrapper>
       <OptionsWrapper>{options}</OptionsWrapper>
     </Wrapper>
   );
@@ -21,8 +25,18 @@ const Wrapper = styled.div`
   gap: ${({ theme }) => theme.spacing[8]};
 `;
 
+const HeaderWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 const Label = styled.span`
   font-size: ${({ theme }) => theme.fontSizes[16]};
+`;
+
+const Selected = styled.span`
+  font-size: ${({ theme }) => theme.fontSizes[20]};
+  font-weight: bold;
 `;
 
 const OptionsWrapper = styled.div`
