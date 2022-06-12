@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { useUser } from 'components/Account/UserContext';
@@ -19,14 +19,22 @@ export default function HabitTracker() {
   const manageLabels = useFormattedMessage('habitTracker.manageLabels');
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
-  const { state } = useUser();
+  const { state, dispatch } = useUser();
+  const navigate = useNavigate();
 
   if (!state.token) {
     return <Navigate to="/login" replace />;
   }
+  const handleLogout = () => {
+    dispatch({ type: 'logout' });
+    navigate('/');
+  };
 
   return (
     <Wrapper>
+      <LogoutButton variant="tertiary" onClick={handleLogout}>
+        Logout
+      </LogoutButton>
       <CalendarAndButtonWrapper>
         <ButtonWrapper>
           <Button onClick={() => setIsEventModalOpen(true)}>{addHabitButton}</Button>
@@ -53,7 +61,7 @@ const Wrapper = styled.main`
   flex-direction: column;
   align-items: center;
   gap: ${({ theme }) => theme.spacing[32]};
-  padding: ${({ theme }) => theme.spacing[32]} 0;
+  padding: ${({ theme }) => `${theme.spacing[64]} 0 ${theme.spacing[32]} 0`};
 `;
 
 const CalendarAndButtonWrapper = styled.div`
@@ -89,4 +97,12 @@ const ButtonWrapper = styled.div`
     flex-direction: column;
     align-items: flex-start;
   }
+`;
+
+export const LogoutButton = styled(Button)`
+  --space: ${({ theme }) => theme.spacing[8]};
+  position: fixed;
+  top: var(--space);
+  right: var(--space);
+  min-width: 0;
 `;

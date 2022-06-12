@@ -22,6 +22,7 @@ import { client, generateUrlFromQueryKey } from 'utils';
 import { Login, Register } from 'components/Account';
 import { UserProvider } from 'components/Account/UserContext';
 import HabitTracker from 'components/HabitTracker';
+import Homepage from 'components/Homepage';
 import ToastContainer, { showToast } from 'components/ToastContainer';
 
 dayjs.extend(isoWeek);
@@ -120,6 +121,7 @@ function App() {
             <ToastContainer />
             <BrowserRouter>
               <Routes>
+                <Route path="/" element={<Homepage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/habit-tracker" element={<HabitTracker />} />
