@@ -33,10 +33,16 @@ const ModalWrapper = styled(Dialog)`
     border-radius: ${({ theme }) => theme.cornerRadius.regular};
     width: calc(100% - var(--space) * 2);
     max-height: calc(100% - var(--space) * 2);
-    margin: var(--space);
+    margin: 0;
     display: flex;
     flex-direction: column;
     gap: ${({ theme }) => theme.spacing[24]};
+    max-width: 400px;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 `;
 

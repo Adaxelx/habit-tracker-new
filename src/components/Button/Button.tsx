@@ -1,11 +1,26 @@
 import { ButtonHTMLAttributes } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-export default function Button(props: ButtonHTMLAttributes<HTMLButtonElement>) {
-  return <NativeButton {...props} />;
+type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
+
+type ButtonProps = {
+  variant?: ButtonVariant;
+} & ButtonHTMLAttributes<HTMLButtonElement>;
+
+export default function Button({ variant = 'primary', ...props }: ButtonProps) {
+  return <NativeButton variant={variant} {...props} />;
 }
 
-const NativeButton = styled.button`
+interface NativeButtonProps {
+  variant: ButtonVariant;
+}
+
+const Tertiary = css`
+  background-color: transparent;
+  color: ${({ theme }) => theme.colors.grays[500]};
+`;
+
+const NativeButton = styled.button<NativeButtonProps>`
   position: relative;
   height: 48px;
   min-width: ${({ theme }) => theme.spacing[128]};
@@ -15,6 +30,13 @@ const NativeButton = styled.button`
   background-color: ${({ theme }) => theme.colors.grays[500]};
   border: none;
   border-radius: ${({ theme }) => theme.cornerRadius.regular};
+  cursor: pointer;
+
+  ${({ variant }) => {
+    if (variant === 'tertiary') {
+      return Tertiary;
+    }
+  }}
 
   &:disabled {
     background-color: ${({ theme }) => theme.colors.grays[700]};

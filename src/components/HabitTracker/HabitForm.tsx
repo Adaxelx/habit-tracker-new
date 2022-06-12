@@ -61,7 +61,7 @@ export default function HabitForm({ isOpen, onClose }: HabitFormProps) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={header}>
+    <HabitModal isOpen={isOpen} onClose={onClose} title={header}>
       <FormWrapper onSubmit={handleSubmit} id="habitForm">
         <Input
           name="Title"
@@ -117,9 +117,11 @@ export default function HabitForm({ isOpen, onClose }: HabitFormProps) {
         ) : null}
         <Button type="submit">{submit}</Button>
       </FormWrapper>
-    </Modal>
+    </HabitModal>
   );
 }
+
+const HabitModal = styled(Modal)``;
 
 const FormWrapper = styled.form`
   display: flex;

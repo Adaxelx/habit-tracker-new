@@ -1,6 +1,8 @@
 export default {
   addHabitButton: 'Add habit',
   addLabelButton: 'Add label',
+  manageHabits: 'Manage habits',
+  manageLabels: 'Manage labels',
   habitForm: {
     header: 'Add your habit!',
     titlePlaceholder: 'Example title...',

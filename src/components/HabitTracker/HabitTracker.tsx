@@ -15,6 +15,8 @@ export default function HabitTracker() {
   const [activeDate, setActiveDate] = useState(new Date());
   const addHabitButton = useFormattedMessage('habitTracker.addHabitButton');
   const addLabelButton = useFormattedMessage('habitTracker.addLabelButton');
+  const manageHabits = useFormattedMessage('habitTracker.manageHabits');
+  const manageLabels = useFormattedMessage('habitTracker.manageLabels');
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [isLabelModalOpen, setIsLabelModalOpen] = useState(false);
   const { state } = useUser();
@@ -25,9 +27,20 @@ export default function HabitTracker() {
 
   return (
     <Wrapper>
-      <Button onClick={() => setIsEventModalOpen(true)}>{addHabitButton}</Button>
-      <Button onClick={() => setIsLabelModalOpen(true)}>{addLabelButton}</Button>
-      <Calendar activeDate={activeDate} setActiveDate={setActiveDate} />
+      <CalendarAndButtonWrapper>
+        <ButtonWrapper>
+          <Button onClick={() => setIsEventModalOpen(true)}>{addHabitButton}</Button>
+          <Button onClick={() => setIsLabelModalOpen(true)}>{addLabelButton}</Button>
+          <Button variant="tertiary" onClick={() => setIsLabelModalOpen(true)}>
+            {manageHabits}
+          </Button>
+          <Button variant="tertiary" onClick={() => setIsLabelModalOpen(true)}>
+            {manageLabels}
+          </Button>
+        </ButtonWrapper>
+        <Calendar activeDate={activeDate} setActiveDate={setActiveDate} />
+        <Spacer />
+      </CalendarAndButtonWrapper>
       <DayCardWrapper activeDate={activeDate} />
       <HabitForm isOpen={isEventModalOpen} onClose={() => setIsEventModalOpen(false)} />
       <LabelForm isOpen={isLabelModalOpen} onClose={() => setIsLabelModalOpen(false)} />
@@ -41,4 +54,39 @@ const Wrapper = styled.main`
   align-items: center;
   gap: ${({ theme }) => theme.spacing[32]};
   padding: ${({ theme }) => theme.spacing[32]} 0;
+`;
+
+const CalendarAndButtonWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  max-width: 350px;
+
+  @media (min-width: 768px) {
+    width: 100%;
+    max-width: none;
+    flex-direction: row-reverse;
+    gap: 16px;
+  }
+`;
+
+const Spacer = styled.div`
+  display: none;
+  @media (min-width: 768px) {
+    flex: 1;
+    display: block;
+  }
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing[16]};
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  @media (min-width: 768px) {
+    justify-content: flex-start;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
