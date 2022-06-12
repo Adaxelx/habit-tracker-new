@@ -4,16 +4,9 @@ import { client } from 'utils';
 
 import { useUser } from 'components/Account/UserContext';
 import { showToast } from 'components/ToastContainer';
-import { generateEventCacheKeys } from 'helpers/calendar';
+import { generateEventCacheKeys, getNewDBItemsAfterEdit } from 'helpers/calendar';
 
 import { Event, EventInterface, Label } from './useCalendar';
-
-export const getNewHabitsAfterEdit = (habits: Event[] | undefined, newEvent: Event) => {
-  const events = [...(habits ?? [])];
-  const index = events.findIndex(({ _id }) => _id === newEvent._id);
-  events.splice(index, 1, newEvent);
-  return events;
-};
 
 export default function useCreateHabit(onClose: () => void, eventId?: string) {
   const queryClient = useQueryClient();
@@ -63,14 +56,14 @@ export default function useCreateHabit(onClose: () => void, eventId?: string) {
           if (!savedCache) return;
           queryClient.setQueryData<Event[]>(eventCacheKey, currentEvents => {
             return eventId
-              ? getNewHabitsAfterEdit(currentEvents, newEvent)
+              ? getNewDBItemsAfterEdit(currentEvents, newEvent)
               : [...(currentEvents ?? []), newEvent];
           });
         });
 
         queryClient.setQueryData<Event[]>(['events'], currentEvents =>
           eventId
-            ? getNewHabitsAfterEdit(currentEvents, newEvent)
+            ? getNewDBItemsAfterEdit(currentEvents, newEvent)
             : [...(currentEvents ?? []), newEvent]
         );
 

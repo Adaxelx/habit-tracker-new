@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { mongoObjectId } from 'utils';
 
@@ -14,6 +14,7 @@ import { useCreateLabel } from './useCreateLabel';
 interface LabelFormProps {
   isOpen: boolean;
   onClose: () => void;
+  previousLabel?: Label;
 }
 
 type ColorOption = {
@@ -31,7 +32,7 @@ interface LabelFormElement extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
-export default function LabelForm({ isOpen, onClose }: LabelFormProps) {
+export default function LabelForm({ isOpen, onClose, previousLabel }: LabelFormProps) {
   const header = useFormattedMessage(`${labelFormTranslations}.header`);
   const titlePlaceholder = useFormattedMessage(`${labelFormTranslations}.titlePlaceholder`);
   const colorLabel = useFormattedMessage(`${labelFormTranslations}.colorLabel`);
@@ -39,7 +40,11 @@ export default function LabelForm({ isOpen, onClose }: LabelFormProps) {
 
   const [color, setColor] = useState<ColorOption | undefined>();
 
-  const labelMutation = useCreateLabel(onClose);
+  useEffect(() => {
+    setColor(colors.find(color => color.color === previousLabel?.color));
+  }, [previousLabel]);
+
+  const labelMutation = useCreateLabel({ onClose, labelId: previousLabel?._id });
 
   const handleSubmit = (event: React.FormEvent<LabelFormElement>) => {
     event.preventDefault();
@@ -51,14 +56,20 @@ export default function LabelForm({ isOpen, onClose }: LabelFormProps) {
     labelMutation.mutate({
       title: title.value,
       color: color?.color,
-      _id: mongoObjectId(),
+      _id: previousLabel?._id ?? mongoObjectId(),
     });
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={header}>
       <FormWrapper onSubmit={handleSubmit}>
-        <Input name="Title" htmlFor="title" placeholder={titlePlaceholder} showLabel />
+        <Input
+          name="Title"
+          htmlFor="title"
+          defaultValue={previousLabel?.title ?? ''}
+          placeholder={titlePlaceholder}
+          showLabel
+        />
         <Select
           options={colors.map(value => (
             <LabelOption

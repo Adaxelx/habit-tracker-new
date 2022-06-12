@@ -35,3 +35,13 @@ export const generateEventCacheKeys = (dateStart: Dayjs, dateEnd: Dayjs) => {
 
   return eventKeys;
 };
+
+export function getNewDBItemsAfterEdit<DBItem extends { _id: string }>(
+  dbItems: DBItem[] | undefined,
+  dbItem: DBItem
+) {
+  const newDbItems = [...(dbItems ?? [])];
+  const index = newDbItems.findIndex(({ _id }) => _id === dbItem._id);
+  newDbItems.splice(index, 1, dbItem);
+  return newDbItems;
+}

@@ -23,7 +23,7 @@ import { Login, Register } from 'components/Account';
 import { UserProvider } from 'components/Account/UserContext';
 import HabitTracker from 'components/HabitTracker';
 import Homepage from 'components/Homepage';
-import { HabitManager } from 'components/Managers';
+import { HabitManager, LabelManager } from 'components/Managers';
 import ToastContainer, { showToast } from 'components/ToastContainer';
 
 dayjs.extend(isoWeek);
@@ -127,6 +127,7 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/habit-tracker" element={<HabitTracker />} />
                 <Route path="/habit-manager" element={<HabitManager />} />
+                <Route path="/label-manager" element={<LabelManager />} />
               </Routes>
             </BrowserRouter>
           </UserProvider>
