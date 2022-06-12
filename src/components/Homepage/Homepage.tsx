@@ -43,17 +43,17 @@ const ContentWrapper = styled.header`
   z-index: 1;
 `;
 
-const Rectangle = styled.div`
-  position: absolute;
-  top: 50%;
-  right: 0;
-  transform: translate(10%, -50%);
-  background-color: ${({ theme }) => theme.colors.grays[800]};
-  /* padding: ${({ theme }) => `${theme.spacing[12]} ${theme.spacing[24]}`}; */
-  border-radius: ${({ theme }) => theme.cornerRadius.regular};
-  width: 333px;
-  height: 174px;
-`;
+// const Rectangle = styled.div`
+//   position: absolute;
+//   top: 50%;
+//   right: 0;
+//   transform: translate(10%, -50%);
+//   background-color: ${({ theme }) => theme.colors.grays[800]};
+//   /* padding: ${({ theme }) => `${theme.spacing[12]} ${theme.spacing[24]}`}; */
+//   border-radius: ${({ theme }) => theme.cornerRadius.regular};
+//   width: 333px;
+//   height: 174px;
+// `;
 
 const RegisterButton = styled(Button)`
   margin-top: ${({ theme }) => theme.spacing[24]};

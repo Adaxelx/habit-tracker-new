@@ -1,29 +1,14 @@
 import { useMutation, useQueryClient } from 'react-query';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { client } from 'utils';
 
 import { useUser } from 'components/Account/UserContext';
 import { showToast } from 'components/ToastContainer';
-import { getEndDate, getStartDate } from 'helpers/calendar';
+import { generateEventCacheKeys } from 'helpers/calendar';
 
 import { Event, EventInterface, Label } from './useCalendar';
 
-const generateEventCacheKeys = (dateStart: Dayjs, dateEnd: Dayjs) => {
-  let currentMonth = dateStart;
-  const eventKeys = [];
-
-  while (currentMonth.month() <= dateEnd.month()) {
-    eventKeys.push([
-      'events',
-      { from: getStartDate(currentMonth.toDate()), to: getEndDate(currentMonth.toDate()) },
-    ]);
-    currentMonth = currentMonth.add(1, 'month');
-  }
-
-  return eventKeys;
-};
-
-const getNewHabitsAfterEdit = (habits: Event[] | undefined, newEvent: Event) => {
+export const getNewHabitsAfterEdit = (habits: Event[] | undefined, newEvent: Event) => {
   const events = [...(habits ?? [])];
   const index = events.findIndex(({ _id }) => _id === newEvent._id);
   events.splice(index, 1, newEvent);
@@ -68,9 +53,10 @@ export default function useCreateHabit(onClose: () => void, eventId?: string) {
           dayjs(variables.dateEnd)
         );
 
-        const savedCache = eventCacheKeys.map(eventCacheKey =>
+        const dateHabitsSaved = eventCacheKeys.map(eventCacheKey =>
           queryClient.getQueryData<Event[]>(eventCacheKey)
         );
+        const allHabitsSaved = queryClient.getQueryData<Event[]>(['events']);
 
         eventCacheKeys.forEach(eventCacheKey => {
           const savedCache = queryClient.getQueryData<Event[]>(eventCacheKey);
@@ -95,8 +81,9 @@ export default function useCreateHabit(onClose: () => void, eventId?: string) {
 
         return () => {
           eventCacheKeys.forEach((eventCacheKey, index) => {
-            queryClient.setQueryData<Event[]>(eventCacheKey, savedCache[index]);
+            queryClient.setQueryData<Event[]>(eventCacheKey, dateHabitsSaved[index]);
           });
+          queryClient.setQueryData<Event[]>(['events'], allHabitsSaved);
         };
       },
       onError: (data, variables, restoreCache) => {

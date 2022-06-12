@@ -10,10 +10,13 @@ import { DefaultOption } from 'components/FormControls/Select';
 import HabitForm, { weekDays } from 'components/HabitTracker/HabitForm';
 import { Event } from 'components/HabitTracker/useCalendar';
 
+import HabitDeleteConfirmation from './HabitDeleteConfirmation';
+
 export default function HabitManager() {
   const events = useQuery<Event[]>(['events']);
 
-  const [openEventId, setOpenEventId] = useState('');
+  const [openEditEventId, setOpenEditEventId] = useState('');
+  const [openDeleteEventId, setOpenDeleteEventId] = useState('');
 
   if (events.isLoading || events.isError) {
     return null;
@@ -54,17 +57,22 @@ export default function HabitManager() {
                 {description ? <Description>{description}</Description> : null}
               </Content>
               <ButtonsWrapper>
-                <Action onClick={() => setOpenEventId(_id)}>Edit</Action>
-                <Action>X</Action>
+                <Action onClick={() => setOpenEditEventId(_id)}>Edit</Action>
+                <Action onClick={() => setOpenDeleteEventId(_id)}>X</Action>
               </ButtonsWrapper>
             </Habit>
           )
         )}
       </HabitsWrapper>
       <HabitForm
-        isOpen={Boolean(openEventId)}
-        onClose={() => setOpenEventId('')}
-        previousEvent={events.data.find(({ _id }) => _id === openEventId)}
+        isOpen={Boolean(openEditEventId)}
+        onClose={() => setOpenEditEventId('')}
+        previousEvent={events.data.find(({ _id }) => _id === openEditEventId)}
+      />
+      <HabitDeleteConfirmation
+        isOpen={Boolean(openDeleteEventId)}
+        onClose={() => setOpenDeleteEventId('')}
+        habit={events.data.find(({ _id }) => _id === openDeleteEventId)}
       />
     </Wrapper>
   );
