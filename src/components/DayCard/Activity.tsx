@@ -16,6 +16,7 @@ export default function Activity({
   description,
   checked,
   date,
+  label,
   _id,
 }: ActivityProps) {
   const mutation = useToggleChecked({ id: _id, date, checked });
@@ -33,7 +34,8 @@ export default function Activity({
       </MainContent>
       <Aside>
         <Checkbox checked={checked} />
-        <Badge />
+        {label ? <Label color={label.color} /> : null}
+        {/* <Badge /> */}
       </Aside>
     </Wrapper>
   );
@@ -71,6 +73,8 @@ const Aside = styled.aside`
   width: 32px; // tmp
   gap: ${({ theme }) => theme.spacing[12]};
   align-items: center;
+
+  --size: ${({ theme }) => theme.spacing[24]};
 `;
 
 // const Divider = styled.div`
@@ -80,9 +84,20 @@ const Aside = styled.aside`
 // `;
 
 const Badge = styled.div`
-  --size: ${({ theme }) => theme.spacing[24]};
   width: var(--size);
   height: var(--size);
   background-color: ${({ theme }) => theme.colors.grays[800]};
   border-radius: ${({ theme }) => theme.cornerRadius.small};
+`;
+
+interface LabelProps {
+  color: string;
+}
+
+const Label = styled.div<LabelProps>`
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background-color: ${({ color }) => color};
+  border: 1px solid ${({ theme }) => theme.colors.grays[50]};
 `;
