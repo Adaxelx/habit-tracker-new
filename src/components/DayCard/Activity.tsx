@@ -94,7 +94,7 @@ interface LabelProps {
   color: string;
 }
 
-const Label = styled.div<LabelProps>`
+export const Label = styled.div<LabelProps>`
   width: var(--size);
   height: var(--size);
   border-radius: 50%;

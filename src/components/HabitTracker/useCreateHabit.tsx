@@ -23,12 +23,20 @@ const generateEventCacheKeys = (dateStart: Dayjs, dateEnd: Dayjs) => {
   return eventKeys;
 };
 
-export default function useCreateHabit(onClose: () => void) {
+const getNewHabitsAfterEdit = (habits: Event[] | undefined, newEvent: Event) => {
+  const events = [...(habits ?? [])];
+  const index = events.findIndex(({ _id }) => _id === newEvent._id);
+  events.splice(index, 1, newEvent);
+  return events;
+};
+
+export default function useCreateHabit(onClose: () => void, eventId?: string) {
   const queryClient = useQueryClient();
   const { state } = useUser();
 
   return useMutation<unknown, unknown, EventInterface & { _id: string; label?: string }>(
-    body => client('/events', { body }),
+    body =>
+      client(`/events${eventId ? `/${eventId}` : ''}`, { body, method: eventId ? 'PUT' : 'POST' }),
     {
       onSuccess: (_, variables, restoreCache) => {
         (restoreCache as () => void)?.();
@@ -39,6 +47,7 @@ export default function useCreateHabit(onClose: () => void) {
         const refetchOfEvents = eventCacheKeys.map(eventCacheKey =>
           queryClient.invalidateQueries(eventCacheKey)
         );
+        queryClient.invalidateQueries(['events'], { exact: true });
         showToast('Successfuly added habit', { type: 'success' });
         onClose();
         return Promise.all(refetchOfEvents);
@@ -67,9 +76,17 @@ export default function useCreateHabit(onClose: () => void) {
           const savedCache = queryClient.getQueryData<Event[]>(eventCacheKey);
           if (!savedCache) return;
           queryClient.setQueryData<Event[]>(eventCacheKey, currentEvents => {
-            return [...(currentEvents ?? []), newEvent];
+            return eventId
+              ? getNewHabitsAfterEdit(currentEvents, newEvent)
+              : [...(currentEvents ?? []), newEvent];
           });
         });
+
+        queryClient.setQueryData<Event[]>(['events'], currentEvents =>
+          eventId
+            ? getNewHabitsAfterEdit(currentEvents, newEvent)
+            : [...(currentEvents ?? []), newEvent]
+        );
 
         if (!navigator.onLine) {
           showToast('(Without internet) Succesfuly added habit', { type: 'success' });

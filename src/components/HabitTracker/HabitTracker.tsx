@@ -39,10 +39,10 @@ export default function HabitTracker() {
         <ButtonWrapper>
           <Button onClick={() => setIsEventModalOpen(true)}>{addHabitButton}</Button>
           <Button onClick={() => setIsLabelModalOpen(true)}>{addLabelButton}</Button>
-          <Button variant="tertiary" onClick={() => setIsLabelModalOpen(true)}>
+          <Button variant="tertiary" onClick={() => navigate('/habit-manager')}>
             {manageHabits}
           </Button>
-          <Button variant="tertiary" onClick={() => setIsLabelModalOpen(true)}>
+          <Button variant="tertiary" onClick={() => navigate('/label-manager')}>
             {manageLabels}
           </Button>
         </ButtonWrapper>
@@ -68,7 +68,7 @@ const CalendarAndButtonWrapper = styled.div`
   display: flex;
   flex-direction: column;
   max-width: 350px;
-
+  gap: ${({ theme }) => theme.spacing[32]};
   @media (min-width: 768px) {
     width: 100%;
     max-width: none;
@@ -101,7 +101,7 @@ const ButtonWrapper = styled.div`
 
 export const LogoutButton = styled(Button)`
   --space: ${({ theme }) => theme.spacing[8]};
-  position: fixed;
+  position: absolute;
   top: var(--space);
   right: var(--space);
   min-width: 0;

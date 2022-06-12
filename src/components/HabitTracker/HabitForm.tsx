@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
+import dayjs from 'dayjs';
 import styled from 'styled-components';
 import { handleAddRemoveToggleInArray, mongoObjectId } from 'utils';
 
@@ -9,7 +10,7 @@ import Select, { DefaultOption } from 'components/FormControls/Select';
 import Modal from 'components/Modal';
 import useFormattedMessage from 'hooks/useFormattedMessage';
 
-import { EventInterface, Label } from './useCalendar';
+import { Event, EventInterface, Label } from './useCalendar';
 import useCreateHabit from './useCreateHabit';
 
 type FormElements = HTMLFormControlsCollection &
@@ -21,11 +22,14 @@ interface HabitFormElement extends HTMLFormElement {
 interface HabitFormProps {
   isOpen: boolean;
   onClose: () => void;
+  previousEvent?: Event;
 }
+
+const DATEPICKER_DATE_FORMAT = 'YYYY-MM-DD';
 
 const habitFormTranslations = 'habitTracker.habitForm';
 
-export default function HabitForm({ isOpen, onClose }: HabitFormProps) {
+export default function HabitForm({ isOpen, onClose, previousEvent }: HabitFormProps) {
   const header = useFormattedMessage(`${habitFormTranslations}.header`);
   const titlePlaceholder = useFormattedMessage(`${habitFormTranslations}.titlePlaceholder`);
   const dateStart = useFormattedMessage(`${habitFormTranslations}.dateStart`);
@@ -39,14 +43,14 @@ export default function HabitForm({ isOpen, onClose }: HabitFormProps) {
   const [daysOfWeek, setDaysOfWeek] = useState<number[]>([]);
   const [label, setLabel] = useState('');
 
-  const habitMutation = useCreateHabit(onClose);
+  const habitMutation = useCreateHabit(onClose, previousEvent?._id);
 
   const labels = useQuery<Label[]>(['labels']);
 
   const handleSubmit = (event: React.FormEvent<HabitFormElement>) => {
     event.preventDefault();
     const data = event.currentTarget.elements;
-    const { timeStart, timeEnd, title, dateEnd, dateStart } = data;
+    const { timeStart, timeEnd, title, dateEnd, dateStart, description } = data;
 
     habitMutation.mutate({
       timeStart: timeStart.value,
@@ -54,11 +58,19 @@ export default function HabitForm({ isOpen, onClose }: HabitFormProps) {
       title: title.value,
       dateEnd: dateEnd.value,
       dateStart: dateStart.value,
+      description: description.value,
       daysOfWeek,
       label,
-      _id: mongoObjectId(),
+      _id: previousEvent?._id ?? mongoObjectId(),
     });
   };
+
+  useEffect(() => {
+    if (previousEvent) {
+      setDaysOfWeek(previousEvent?.daysOfWeek);
+      setLabel(previousEvent?.label?._id ?? '');
+    }
+  }, [previousEvent]);
 
   return (
     <HabitModal isOpen={isOpen} onClose={onClose} title={header}>
@@ -66,14 +78,14 @@ export default function HabitForm({ isOpen, onClose }: HabitFormProps) {
         <Input
           name="Title"
           htmlFor="title"
-          defaultValue={'test'}
+          defaultValue={previousEvent?.title ?? ''}
           placeholder={titlePlaceholder}
           showLabel
         />
         <TextArea
           name="Description"
           htmlFor="description"
-          defaultValue={'test'}
+          defaultValue={previousEvent?.description ?? ''}
           showLabel
           placeholder="10 pushups every hour for better physical strength"
         />
@@ -81,12 +93,38 @@ export default function HabitForm({ isOpen, onClose }: HabitFormProps) {
           name={dateStart}
           htmlFor="dateStart"
           type="date"
-          defaultValue={'2022-06-01'}
+          defaultValue={
+            previousEvent?.dateStart
+              ? dayjs(previousEvent.dateStart).format(DATEPICKER_DATE_FORMAT)
+              : ''
+          }
           showLabel
         />
-        <Input name={dateEnd} htmlFor="dateEnd" defaultValue={'2022-06-30'} type="date" showLabel />
-        <Input name={timeStart} htmlFor="timeStart" defaultValue={'10:22'} type="time" showLabel />
-        <Input name={timeEnd} htmlFor="timeEnd" defaultValue={'20:30'} type="time" showLabel />
+        <Input
+          name={dateEnd}
+          htmlFor="dateEnd"
+          defaultValue={
+            previousEvent?.dateEnd
+              ? dayjs(previousEvent.dateEnd).format(DATEPICKER_DATE_FORMAT)
+              : ''
+          }
+          type="date"
+          showLabel
+        />
+        <Input
+          name={timeStart}
+          htmlFor="timeStart"
+          defaultValue={previousEvent?.timeStart ?? ''}
+          type="time"
+          showLabel
+        />
+        <Input
+          name={timeEnd}
+          htmlFor="timeEnd"
+          defaultValue={previousEvent?.timeEnd ?? ''}
+          type="time"
+          showLabel
+        />
         <Select
           options={weekDays.map(({ name, value }) => (
             <DefaultOption
@@ -101,7 +139,7 @@ export default function HabitForm({ isOpen, onClose }: HabitFormProps) {
           ))}
           label={daysOfWeekTitle}
         />
-        {labels.data ? (
+        {labels.data?.length ? (
           <Select
             options={labels.data.map(({ color, _id }) => (
               <LabelOption
@@ -137,12 +175,12 @@ const LabelOption = styled(DefaultOption)<LabelOptionProps>`
   background-color: ${({ color }) => color};
 `;
 
-const weekDays = [
-  { name: 'M', value: 1 },
-  { name: 'T', value: 2 },
-  { name: 'W', value: 3 },
-  { name: 'T', value: 4 },
-  { name: 'F', value: 5 },
-  { name: 'S', value: 6 },
-  { name: 'S', value: 0 },
+export const weekDays = [
+  { name: 'Mo', value: 1 },
+  { name: 'Tu', value: 2 },
+  { name: 'We', value: 3 },
+  { name: 'Th', value: 4 },
+  { name: 'Fr', value: 5 },
+  { name: 'Sa', value: 6 },
+  { name: 'Su', value: 0 },
 ];
