@@ -19,7 +19,6 @@ export default function useDeleteLabel({ label, onClose }: UseDeleteHabitProps) 
     body => client(`/labels${labelId ? `/${labelId}` : ''}`, { body, method: 'DELETE' }),
     {
       onSuccess: async (_, _1, restoreCache) => {
-        (restoreCache as () => void)?.();
         const eventCacheKey = ['labels'];
 
         queryClient.invalidateQueries(eventCacheKey);

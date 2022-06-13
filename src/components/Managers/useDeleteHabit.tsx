@@ -20,7 +20,6 @@ export function useDeleteHabit({ habit, onClose }: UseDeleteHabitProps) {
     body => client(`/events${habitId ? `/${habitId}` : ''}`, { body, method: 'DELETE' }),
     {
       onSuccess: (_, _1, restoreCache) => {
-        (restoreCache as () => void)?.();
         const eventCacheKeys = generateEventCacheKeys(
           dayjs(habit?.dateStart),
           dayjs(habit?.dateEnd)

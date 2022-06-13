@@ -23,13 +23,13 @@ export function useCreateLabel({ onClose, labelId }: UseCreateLabelProps) {
     body =>
       client(`/labels${labelId ? `/${labelId}` : ''}`, { body, method: labelId ? 'PUT' : 'POST' }),
     {
-      onSuccess: async (_, variables, restoreCache) => {
-        (restoreCache as () => void)?.();
+      onSuccess: async (_, variables) => {
         showToast(`Successfuly ${labelId ? 'edited' : 'added'} label`, { type: 'success' });
         onClose();
         if (labelId) {
           await invalidateAllHabitsForGivenLabel({ queryClient, labelId });
         }
+        return queryClient.invalidateQueries(['labels']);
       },
       onMutate: variables => {
         const userId = state?.token?.split?.(':')?.[1] ?? '';

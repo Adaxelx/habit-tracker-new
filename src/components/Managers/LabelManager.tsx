@@ -7,6 +7,7 @@ import { Label as LabelDot } from 'components/DayCard/Activity';
 import LabelForm from 'components/HabitTracker/LabelForm';
 import { Label } from 'components/HabitTracker/useCalendar';
 
+import { ElementsWrapper, ElementWrapper } from './HabitManager';
 import LabelDeleteConfirmation from './LabelDeleteConfirmation';
 
 export default function HabitManager() {
@@ -22,7 +23,7 @@ export default function HabitManager() {
   return (
     <Wrapper>
       <h2>Your labels</h2>
-      <LabelsWrapper>
+      <ElementsWrapper>
         {labels.data.map(({ _id, title, color }) => (
           <LabelWrapper key={_id}>
             <TitleWrapper>
@@ -35,7 +36,7 @@ export default function HabitManager() {
             </ButtonsWrapper>
           </LabelWrapper>
         ))}
-      </LabelsWrapper>
+      </ElementsWrapper>
       <LabelForm
         isOpen={Boolean(openEditLabelId)}
         onClose={() => setOpenEditLabelId('')}
@@ -59,16 +60,14 @@ const ButtonsWrapper = styled.div`
   gap: ${({ theme }) => theme.spacing[8]};
 `;
 
-const LabelsWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacing[16]};
-`;
-
-const LabelWrapper = styled.section`
+const LabelWrapper = styled(ElementWrapper)`
   display: flex;
   align-items: baseline;
   gap: ${({ theme }) => theme.spacing[8]};
+
+  border-radius: ${({ theme }) => theme.cornerRadius.regular};
+  background-color: ${({ theme }) => theme.colors.grays[800]};
+  padding: ${({ theme }) => `${theme.spacing[16]}`};
 `;
 
 const TitleWrapper = styled.div`

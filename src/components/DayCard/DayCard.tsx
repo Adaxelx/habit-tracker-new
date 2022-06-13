@@ -1,4 +1,4 @@
-import { dateFormat } from 'consts';
+import { dateFormat, visibleDateFormat } from 'consts';
 import dayjs, { Dayjs } from 'dayjs';
 import styled from 'styled-components';
 
@@ -41,7 +41,7 @@ const DayCard = ({ date, events, className = '', isActive }: DayCardProps) => {
       id={`dayCard:${dayjsDate.format(dateFormat)}`}
       isActive={isActive}
     >
-      <Date>{new Intl.DateTimeFormat('en-GB').format(dayjsDate.toDate())}</Date>
+      <Date>{dayjsDate.format(visibleDateFormat)}</Date>
       <h5>{formatDayOfWeek}</h5>
       <ActivityWrapper>
         <Line />

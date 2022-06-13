@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from 'react-query';
-import { dateFormat } from 'consts';
+import { visibleDateFormat } from 'consts';
 import dayjs from 'dayjs';
 import styled from 'styled-components';
 
@@ -25,7 +25,7 @@ export default function HabitManager() {
   return (
     <Wrapper>
       <h2>Your habits</h2>
-      <HabitsWrapper>
+      <ElementsWrapper>
         {events.data.map(
           ({
             _id,
@@ -51,9 +51,12 @@ export default function HabitManager() {
                     </DayOfWeek>
                   ))}
                 </DaysOfWeek>
-                <Time>{`${timeStart} - ${timeEnd}, ${dayjs(dateStart).format(dateFormat)} - ${dayjs(
-                  dateEnd
-                ).format(dateFormat)}`}</Time>
+                <Time>
+                  <Hours>{`${timeStart} - ${timeEnd}`}</Hours>
+                  <Dates>{`${dayjs(dateStart).format(visibleDateFormat)} - ${dayjs(dateEnd).format(
+                    visibleDateFormat
+                  )}`}</Dates>
+                </Time>
                 {description ? <Description>{description}</Description> : null}
               </Content>
               <ButtonsWrapper>
@@ -63,7 +66,7 @@ export default function HabitManager() {
             </Habit>
           )
         )}
-      </HabitsWrapper>
+      </ElementsWrapper>
       <HabitForm
         isOpen={Boolean(openEditEventId)}
         onClose={() => setOpenEditEventId('')}
@@ -99,15 +102,31 @@ const DayOfWeek = styled(DefaultOption)`
   font-size: ${({ theme }) => theme.fontSizes[12]};
 `;
 
-const HabitsWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
+export const ElementsWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1;
+  grid-template-rows: auto;
   gap: ${({ theme }) => theme.spacing[16]};
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+  }
+  @media (min-width: 1240px) {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto;
+  }
 `;
 
-const Habit = styled.section`
+export const ElementWrapper = styled.section`
   display: flex;
-  gap: ${({ theme }) => theme.spacing[8]};
+  gap: ${({ theme }) => theme.spacing[16]};
+  border-radius: ${({ theme }) => theme.cornerRadius.regular};
+  padding: ${({ theme }) => `${theme.spacing[16]}`};
+`;
+
+const Habit = styled(ElementWrapper)`
+  background-color: ${({ theme }) => theme.colors.grays[900]};
 `;
 
 const Content = styled.div`
@@ -131,7 +150,20 @@ const Title = styled.span`
 
 const Description = styled.p``;
 
-const Time = styled.span``;
+const Time = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing[4]};
+  align-items: baseline;
+  font-size: ${({ theme }) => theme.fontSizes[14]};
+`;
+
+const Hours = styled.span`
+  color: ${({ theme }) => theme.colors.grays[100]};
+`;
+
+const Dates = styled.span`
+  color: ${({ theme }) => theme.colors.grays[600]};
+`;
 
 export const Wrapper = styled.article`
   display: flex;

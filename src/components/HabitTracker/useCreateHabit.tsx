@@ -16,8 +16,7 @@ export default function useCreateHabit(onClose: () => void, eventId?: string) {
     body =>
       client(`/events${eventId ? `/${eventId}` : ''}`, { body, method: eventId ? 'PUT' : 'POST' }),
     {
-      onSuccess: (_, variables, restoreCache) => {
-        (restoreCache as () => void)?.();
+      onSuccess: (_, variables) => {
         const eventCacheKeys = generateEventCacheKeys(
           dayjs(variables.dateStart),
           dayjs(variables.dateEnd)
