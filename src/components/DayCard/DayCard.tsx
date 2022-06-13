@@ -1,3 +1,4 @@
+import Skeleton from 'react-loading-skeleton';
 import { dateFormat, visibleDateFormat } from 'consts';
 import dayjs, { Dayjs } from 'dayjs';
 import styled from 'styled-components';
@@ -64,6 +65,12 @@ interface WrapperProps {
   isActive: boolean;
 }
 
+export const DayCardSkeleton = styled(Skeleton)`
+  min-width: 300px;
+  height: 600px;
+  border-radius: ${({ theme }) => theme.cornerRadius.regular};
+`;
+
 const Wrapper = styled.section<WrapperProps>`
   display: flex;
   flex-direction: column;
@@ -72,7 +79,7 @@ const Wrapper = styled.section<WrapperProps>`
   width: 100%;
   min-width: 300px;
   height: 600px;
-  border-radius: ${({ theme }) => theme.cornerRadius.regular};
+
   background-color: ${({ theme }) => theme.colors.grays[1000]};
   box-shadow: ${({ isActive }) =>
     `0px ${isActive ? 8 : 4}px ${isActive ? 8 : 4}px rgba(0, 0, 0, 0.25);`}

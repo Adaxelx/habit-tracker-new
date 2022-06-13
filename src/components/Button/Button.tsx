@@ -1,14 +1,20 @@
 import { ButtonHTMLAttributes } from 'react';
 import styled, { css } from 'styled-components';
 
+import { SmallLoader } from 'components/Loader';
+
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
 
 type ButtonProps = {
   variant?: ButtonVariant;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
-export default function Button({ variant = 'primary', ...props }: ButtonProps) {
-  return <NativeButton variant={variant} {...props} />;
+export default function Button({ variant = 'primary', disabled, children, ...props }: ButtonProps) {
+  return (
+    <NativeButton variant={variant} {...props} disabled={disabled}>
+      {disabled ? <SmallLoader /> : children}
+    </NativeButton>
+  );
 }
 
 interface NativeButtonProps {
@@ -32,6 +38,9 @@ const NativeButton = styled.button<NativeButtonProps>`
   border-radius: ${({ theme }) => theme.cornerRadius.regular};
   cursor: pointer;
 
+  display: grid;
+  place-content: center;
+
   ${({ variant }) => {
     if (variant === 'tertiary') {
       return Tertiary;
@@ -39,7 +48,9 @@ const NativeButton = styled.button<NativeButtonProps>`
   }}
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.grays[700]};
+    background-color: ${({ theme }) => theme.colors.grays[900]};
+    color: ${({ theme }) => theme.colors.grays[800]};
+    cursor: not-allowed;
   }
 `;
 

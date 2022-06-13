@@ -9,6 +9,7 @@ import { Label } from 'components/DayCard/Activity';
 import { DefaultOption } from 'components/FormControls/Select';
 import HabitForm, { weekDays } from 'components/HabitTracker/HabitForm';
 import { Event } from 'components/HabitTracker/useCalendar';
+import Loader from 'components/Loader';
 
 import HabitDeleteConfirmation from './HabitDeleteConfirmation';
 
@@ -18,65 +19,72 @@ export default function HabitManager() {
   const [openEditEventId, setOpenEditEventId] = useState('');
   const [openDeleteEventId, setOpenDeleteEventId] = useState('');
 
-  if (events.isLoading || events.isError) {
+  if (events.isError) {
     return null;
   }
 
   return (
     <Wrapper>
       <h2>Your habits</h2>
-      <ElementsWrapper>
-        {events.data.map(
-          ({
-            _id,
-            title,
-            description,
-            timeEnd,
-            timeStart,
-            dateStart,
-            dateEnd,
-            daysOfWeek,
-            label,
-          }) => (
-            <Habit key={_id}>
-              <Content>
-                <TitleWrapper>
-                  <Title>{title}</Title>
-                  {label ? <Label color={label?.color} /> : null}
-                </TitleWrapper>
-                <DaysOfWeek>
-                  {daysOfWeek.map(day => (
-                    <DayOfWeek active={false} key={day}>
-                      {weekDays.find(weekDay => weekDay.value === day)?.name}
-                    </DayOfWeek>
-                  ))}
-                </DaysOfWeek>
-                <Time>
-                  <Hours>{`${timeStart} - ${timeEnd}`}</Hours>
-                  <Dates>{`${dayjs(dateStart).format(visibleDateFormat)} - ${dayjs(dateEnd).format(
-                    visibleDateFormat
-                  )}`}</Dates>
-                </Time>
-                {description ? <Description>{description}</Description> : null}
-              </Content>
-              <ButtonsWrapper>
-                <Action onClick={() => setOpenEditEventId(_id)}>Edit</Action>
-                <Action onClick={() => setOpenDeleteEventId(_id)}>X</Action>
-              </ButtonsWrapper>
-            </Habit>
-          )
-        )}
-      </ElementsWrapper>
-      <HabitForm
-        isOpen={Boolean(openEditEventId)}
-        onClose={() => setOpenEditEventId('')}
-        previousEvent={events.data.find(({ _id }) => _id === openEditEventId)}
-      />
-      <HabitDeleteConfirmation
-        isOpen={Boolean(openDeleteEventId)}
-        onClose={() => setOpenDeleteEventId('')}
-        habit={events.data.find(({ _id }) => _id === openDeleteEventId)}
-      />
+      {events.isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <ElementsWrapper>
+            {events.data.map(
+              ({
+                _id,
+                title,
+                description,
+                timeEnd,
+                timeStart,
+                dateStart,
+                dateEnd,
+                daysOfWeek,
+                label,
+              }) => (
+                <Habit key={_id}>
+                  <Content>
+                    <TitleWrapper>
+                      <Title>{title}</Title>
+                      {label ? <Label color={label?.color} /> : null}
+                    </TitleWrapper>
+                    <DaysOfWeek>
+                      {daysOfWeek.map(day => (
+                        <DayOfWeek active={false} key={day}>
+                          {weekDays.find(weekDay => weekDay.value === day)?.name}
+                        </DayOfWeek>
+                      ))}
+                    </DaysOfWeek>
+                    <Time>
+                      <Hours>{`${timeStart} - ${timeEnd}`}</Hours>
+                      <Dates>{`${dayjs(dateStart).format(visibleDateFormat)} - ${dayjs(
+                        dateEnd
+                      ).format(visibleDateFormat)}`}</Dates>
+                    </Time>
+                    {description ? <Description>{description}</Description> : null}
+                  </Content>
+                  <ButtonsWrapper>
+                    <Action onClick={() => setOpenEditEventId(_id)}>Edit</Action>
+                    <Action onClick={() => setOpenDeleteEventId(_id)}>X</Action>
+                  </ButtonsWrapper>
+                </Habit>
+              )
+            )}
+          </ElementsWrapper>
+
+          <HabitForm
+            isOpen={Boolean(openEditEventId)}
+            onClose={() => setOpenEditEventId('')}
+            previousEvent={events.data.find(({ _id }) => _id === openEditEventId)}
+          />
+          <HabitDeleteConfirmation
+            isOpen={Boolean(openDeleteEventId)}
+            onClose={() => setOpenDeleteEventId('')}
+            habit={events.data.find(({ _id }) => _id === openDeleteEventId)}
+          />
+        </>
+      )}
     </Wrapper>
   );
 }

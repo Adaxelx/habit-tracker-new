@@ -6,6 +6,7 @@ import Button from 'components/Button';
 import { Label as LabelDot } from 'components/DayCard/Activity';
 import LabelForm from 'components/HabitTracker/LabelForm';
 import { Label } from 'components/HabitTracker/useCalendar';
+import Loader from 'components/Loader';
 
 import { ElementsWrapper, ElementWrapper } from './HabitManager';
 import LabelDeleteConfirmation from './LabelDeleteConfirmation';
@@ -16,37 +17,46 @@ export default function HabitManager() {
   const [openEditLabelId, setOpenEditLabelId] = useState('');
   const [openDeleteLabelId, setOpenDeleteLabelId] = useState('');
 
-  if (labels.isLoading || labels.isError) {
+  if (labels.isError) {
     return null;
   }
 
   return (
     <Wrapper>
       <h2>Your labels</h2>
-      <ElementsWrapper>
-        {labels.data.map(({ _id, title, color }) => (
-          <LabelWrapper key={_id}>
-            <TitleWrapper>
-              <Title>{title}</Title>
-              <LabelDot color={color} />
-            </TitleWrapper>
-            <ButtonsWrapper>
-              <Action onClick={() => setOpenEditLabelId(_id)}>Edit</Action>
-              <Action onClick={() => setOpenDeleteLabelId(_id)}>X</Action>
-            </ButtonsWrapper>
-          </LabelWrapper>
-        ))}
-      </ElementsWrapper>
-      <LabelForm
-        isOpen={Boolean(openEditLabelId)}
-        onClose={() => setOpenEditLabelId('')}
-        previousLabel={labels.data.find(({ _id }) => _id === openEditLabelId)}
-      />
-      <LabelDeleteConfirmation
-        isOpen={Boolean(openDeleteLabelId)}
-        onClose={() => setOpenDeleteLabelId('')}
-        label={labels.data.find(({ _id }) => _id === openDeleteLabelId)}
-      />
+      {labels.isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <ElementsWrapper>
+            {labels.data.map(({ _id, title, color }) => (
+              <LabelWrapper key={_id}>
+                <TitleWrapper>
+                  <Title>{title}</Title>
+                  <LabelDot color={color} />
+                </TitleWrapper>
+                <ButtonsWrapper>
+                  <Action onClick={() => setOpenEditLabelId(_id)}>Edit</Action>
+                  <Action onClick={() => setOpenDeleteLabelId(_id)}>X</Action>
+                </ButtonsWrapper>
+              </LabelWrapper>
+            ))}
+          </ElementsWrapper>
+          <LabelForm
+            isOpen={Boolean(openEditLabelId)}
+            onClose={() => setOpenEditLabelId('')}
+            previousLabel={labels.data.find(({ _id }) => _id === openEditLabelId)}
+          />
+          <LabelDeleteConfirmation
+            isOpen={Boolean(openDeleteLabelId)}
+            onClose={() => {
+              console.log('xd');
+              setOpenDeleteLabelId('');
+            }}
+            label={labels.data.find(({ _id }) => _id === openDeleteLabelId)}
+          />
+        </>
+      )}
     </Wrapper>
   );
 }

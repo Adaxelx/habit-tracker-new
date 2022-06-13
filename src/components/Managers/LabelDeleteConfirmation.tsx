@@ -20,10 +20,17 @@ export default function LabelDeleteConfirmation({
   const deleteLabelMutation = useDeleteLabel({ label, onClose });
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <h4>{`Are you sure you want to delete habit '${label?.title}'?`}</h4>
+      <h4>{`Are you sure you want to delete this label?`}</h4>
       <ButtonWrapper>
-        <Button onClick={() => deleteLabelMutation.mutate()}>Yes</Button>
-        <Button onClick={onClose}>No</Button>
+        <Button
+          disabled={deleteLabelMutation.isLoading}
+          onClick={() => deleteLabelMutation.mutate()}
+        >
+          Yes
+        </Button>
+        <Button disabled={deleteLabelMutation.isLoading} onClick={onClose}>
+          No
+        </Button>
       </ButtonWrapper>
     </Modal>
   );

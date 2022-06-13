@@ -153,7 +153,9 @@ export default function HabitForm({ isOpen, onClose, previousEvent }: HabitFormP
             label={labelTitle}
           />
         ) : null}
-        <Button type="submit">{submit}</Button>
+        <Button disabled={habitMutation.isLoading} type="submit">
+          {submit}
+        </Button>
       </FormWrapper>
     </HabitModal>
   );

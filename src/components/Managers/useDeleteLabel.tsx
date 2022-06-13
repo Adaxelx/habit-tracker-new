@@ -24,8 +24,8 @@ export default function useDeleteLabel({ label, onClose }: UseDeleteHabitProps) 
         queryClient.invalidateQueries(eventCacheKey);
 
         showToast('Successfuly deleted label', { type: 'success' });
+        await invalidateAllHabitsForGivenLabel({ queryClient, labelId });
         onClose();
-        return invalidateAllHabitsForGivenLabel({ queryClient, labelId });
       },
       onMutate: () => {
         const labelsCacheKey = ['labels'];

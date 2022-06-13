@@ -2,6 +2,7 @@ import 'react-calendar/dist/Calendar.css';
 
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import RCalendar, { CalendarTileProperties } from 'react-calendar';
+import Skeleton from 'react-loading-skeleton';
 import { dateFormat } from 'consts';
 import dayjs from 'dayjs';
 import styled from 'styled-components';
@@ -25,24 +26,30 @@ export default function Calendar({ activeDate, setActiveDate }: CalendarProps) {
 
   return (
     <Wrapper>
-      <RCalendar
-        locale="en-EN"
-        value={activeDate}
-        onChange={(newDate: Date) => setActiveDate(newDate)}
-        activeStartDate={navigationDate}
-        onActiveStartDateChange={({ activeStartDate }) => {
-          setNavigationDate(activeStartDate);
-        }}
-        tileContent={props => {
-          return (
-            <>
-              {calendarQuery?.data?.[dayjs(props.date).format(dateFormat)]?.map((color, index) => (
-                <Tile {...props} color={color} key={index} index={index} />
-              ))}
-            </>
-          );
-        }}
-      />
+      {calendarQuery.isLoading ? (
+        <CalendarSkeleton />
+      ) : (
+        <RCalendar
+          locale="en-EN"
+          value={activeDate}
+          onChange={(newDate: Date) => setActiveDate(newDate)}
+          activeStartDate={navigationDate}
+          onActiveStartDateChange={({ activeStartDate }) => {
+            setNavigationDate(activeStartDate);
+          }}
+          tileContent={props => {
+            return (
+              <>
+                {calendarQuery?.data?.[dayjs(props.date).format(dateFormat)]?.map(
+                  (color, index) => (
+                    <Tile {...props} color={color} key={index} index={index} />
+                  )
+                )}
+              </>
+            );
+          }}
+        />
+      )}
     </Wrapper>
   );
 }
@@ -51,6 +58,12 @@ const Tile = (props: CalendarTileProperties & { color?: string; index?: number }
   if (props.view !== 'month') return null;
   return <Dot color={props.color} />;
 };
+
+const CalendarSkeleton = styled(Skeleton)`
+  width: 350px;
+  height: 396px;
+  border-radius: ${({ theme }) => theme.cornerRadius.regular};
+`;
 
 const Dot = styled.div`
   --dotDimension: 8px;

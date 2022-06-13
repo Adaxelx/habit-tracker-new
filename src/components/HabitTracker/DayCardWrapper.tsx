@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import styled from 'styled-components';
 
 import DayCard from 'components/DayCard';
+import { DayCardSkeleton } from 'components/DayCard/DayCard';
 import { getEndDate, getStartDate } from 'helpers/calendar';
 
 import { Event } from './useCalendar';
@@ -61,7 +62,17 @@ export default function DayCardWrapper({ activeDate }: DayCardWrapperProps) {
     },
   });
   const refreshKey = useMemo(() => ({ from, to }), [from, to]);
-  if (!query.data) return null;
+  if (query.isLoading) {
+    return (
+      <Wrapper>
+        {new Array(15).fill(10).map(value => {
+          return <DayCardSkeleton />;
+        })}
+      </Wrapper>
+    );
+  } else if (query.isError) {
+    return null;
+  }
 
   return <View data={query.data} refreshKey={refreshKey} activeDate={activeDate} />;
 }

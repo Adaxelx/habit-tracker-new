@@ -82,7 +82,9 @@ export default function LabelForm({ isOpen, onClose, previousLabel }: LabelFormP
           selected={color?.displayName ?? ''}
           label={colorLabel}
         />
-        <Button type="submit">{submit}</Button>
+        <Button disabled={labelMutation.isLoading} type="submit">
+          {submit}
+        </Button>
       </FormWrapper>
     </Modal>
   );

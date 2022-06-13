@@ -24,7 +24,9 @@ export default function Activity({
   return (
     <Wrapper
       onClick={() => {
-        mutation.mutate();
+        if (!mutation.isLoading) {
+          mutation.mutate();
+        }
       }}
     >
       <MainContent>
@@ -33,7 +35,7 @@ export default function Activity({
         <Subtext>{description}</Subtext>
       </MainContent>
       <Aside>
-        <Checkbox checked={checked} />
+        <Checkbox disabled={mutation.isLoading} checked={checked} />
         {label ? <Label color={label.color} /> : null}
         {/* <Badge /> */}
       </Aside>

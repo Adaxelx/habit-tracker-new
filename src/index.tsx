@@ -1,3 +1,6 @@
+import 'react-loading-skeleton/dist/skeleton.css';
+import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 

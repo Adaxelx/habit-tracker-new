@@ -20,6 +20,8 @@
     "react-calendar": "^3.7.0",
     "react-dom": "^18.1.0",
     "react-intl": "^5.25.1",
+    "react-loader-spinner": "^5.1.5",
+    "react-loading-skeleton": "^3.1.0",
     "react-query": "^4.0.0-beta.9",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
