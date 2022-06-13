@@ -21,6 +21,7 @@ import { client, generateUrlFromQueryKey } from 'utils';
 // import DayCard from 'components/DayCard';
 import { Login, Register } from 'components/Account';
 import { UserProvider } from 'components/Account/UserContext';
+import ErrorBoundary from 'components/ErrorBoundary';
 import HabitTracker from 'components/HabitTracker';
 import Homepage from 'components/Homepage';
 import { HabitManager, LabelManager } from 'components/Managers';
@@ -96,9 +97,11 @@ const queryClient = new QueryClient({
       onError,
       staleTime: 1000 * 60 * 5,
       cacheTime: 1000 * 60 * 60 * 24,
+      useErrorBoundary: true,
     },
     mutations: {
       onError,
+      useErrorBoundary: true,
     },
   },
   mutationCache,
@@ -120,16 +123,18 @@ function App() {
             <MergedGlobalStyles />
             {/* <DayCard {...mockedDay} /> */}
             <ToastContainer />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Homepage />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/habit-tracker" element={<HabitTracker />} />
-                <Route path="/habit-manager" element={<HabitManager />} />
-                <Route path="/label-manager" element={<LabelManager />} />
-              </Routes>
-            </BrowserRouter>
+            <ErrorBoundary>
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Homepage />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/habit-tracker" element={<HabitTracker />} />
+                  <Route path="/habit-manager" element={<HabitManager />} />
+                  <Route path="/label-manager" element={<LabelManager />} />
+                </Routes>
+              </BrowserRouter>
+            </ErrorBoundary>
           </UserProvider>
           <ReactQueryDevtools />
         </QueryClientProvider>
