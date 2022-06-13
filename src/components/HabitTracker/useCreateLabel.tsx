@@ -3,15 +3,17 @@ import { client } from 'utils';
 
 import { useUser } from 'components/Account/UserContext';
 import { showToast } from 'components/ToastContainer';
-import { getNewDBItemsAfterEdit } from 'helpers/calendar';
+import { getNewDBItemsAfterEdit, invalidateAllHabitsForGivenLabel } from 'helpers/calendar';
 
 import { LabelSend } from './LabelForm';
-import { Label } from './useCalendar';
+import { Event, Label } from './useCalendar';
 
 interface UseCreateLabelProps {
   onClose: () => void;
   labelId?: string;
 }
+
+// TODO: when label is edited change color in events as well
 
 export function useCreateLabel({ onClose, labelId }: UseCreateLabelProps) {
   const queryClient = useQueryClient();
@@ -21,11 +23,13 @@ export function useCreateLabel({ onClose, labelId }: UseCreateLabelProps) {
     body =>
       client(`/labels${labelId ? `/${labelId}` : ''}`, { body, method: labelId ? 'PUT' : 'POST' }),
     {
-      onSuccess: (_, variables, restoreCache) => {
+      onSuccess: async (_, variables, restoreCache) => {
         (restoreCache as () => void)?.();
         showToast(`Successfuly ${labelId ? 'edited' : 'added'} label`, { type: 'success' });
         onClose();
-        return queryClient.invalidateQueries(['labels']);
+        if (labelId) {
+          await invalidateAllHabitsForGivenLabel({ queryClient, labelId });
+        }
       },
       onMutate: variables => {
         const userId = state?.token?.split?.(':')?.[1] ?? '';
@@ -38,12 +42,27 @@ export function useCreateLabel({ onClose, labelId }: UseCreateLabelProps) {
         queryClient.setQueryData<Label[]>(labelsCacheKey, prevLabels =>
           labelId ? getNewDBItemsAfterEdit(prevLabels, newLabel) : [...(prevLabels ?? []), newLabel]
         );
+        const eventCache = queryClient.getQueriesData<Event[]>(['events']);
+        if (labelId) {
+          queryClient.setQueriesData<Event[]>(['events'], prevEvents => {
+            return (prevEvents ?? []).map(event => ({
+              ...event,
+              label: event?.label && event.label._id === labelId ? newLabel : event.label,
+            }));
+          });
+        }
+
         if (!navigator.onLine) {
           showToast('(Without internet) Succesfuly added label', { type: 'success' });
           onClose();
         }
         return () => {
           queryClient.setQueryData<Label[]>(labelsCacheKey, savedCache);
+          if (labelId) {
+            eventCache.forEach(([cacheKey, cache]) =>
+              queryClient.setQueryData<Event[]>(cacheKey, cache)
+            );
+          }
         };
       },
       onError: (data, variables, restoreCache) => {

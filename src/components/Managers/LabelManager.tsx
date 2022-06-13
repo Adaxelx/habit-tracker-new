@@ -7,6 +7,8 @@ import { Label as LabelDot } from 'components/DayCard/Activity';
 import LabelForm from 'components/HabitTracker/LabelForm';
 import { Label } from 'components/HabitTracker/useCalendar';
 
+import LabelDeleteConfirmation from './LabelDeleteConfirmation';
+
 export default function HabitManager() {
   const labels = useQuery<Label[]>(['labels']);
 
@@ -39,11 +41,11 @@ export default function HabitManager() {
         onClose={() => setOpenEditLabelId('')}
         previousLabel={labels.data.find(({ _id }) => _id === openEditLabelId)}
       />
-      {/* <HabitDeleteConfirmation
+      <LabelDeleteConfirmation
         isOpen={Boolean(openDeleteLabelId)}
         onClose={() => setOpenDeleteLabelId('')}
-        habit={labels.data.find(({ _id }) => _id === openDeleteLabelId)}
-      /> */}
+        label={labels.data.find(({ _id }) => _id === openDeleteLabelId)}
+      />
     </Wrapper>
   );
 }

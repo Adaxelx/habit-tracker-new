@@ -4,10 +4,7 @@ import { client } from 'utils';
 
 import { Event } from 'components/HabitTracker/useCalendar';
 import { showToast } from 'components/ToastContainer';
-import { generateEventCacheKeys } from 'helpers/calendar';
-
-const removeHabitFromArray = (habits: Event[] | undefined, deletedHabit: Event | undefined) =>
-  (habits ?? []).filter(habit => habit._id !== deletedHabit?._id);
+import { generateEventCacheKeys, removeDBItemFromArray } from 'helpers/calendar';
 
 interface UseDeleteHabitProps {
   habit?: Event;
@@ -51,12 +48,12 @@ export function useDeleteHabit({ habit, onClose }: UseDeleteHabitProps) {
           const savedCache = queryClient.getQueryData<Event[]>(eventCacheKey);
           if (!savedCache) return;
           queryClient.setQueryData<Event[]>(eventCacheKey, currentHabits =>
-            removeHabitFromArray(currentHabits, habit)
+            removeDBItemFromArray(currentHabits, habit)
           );
         });
 
         queryClient.setQueryData<Event[]>(['events'], currentHabits =>
-          removeHabitFromArray(currentHabits, habit)
+          removeDBItemFromArray(currentHabits, habit)
         );
 
         if (!navigator.onLine) {

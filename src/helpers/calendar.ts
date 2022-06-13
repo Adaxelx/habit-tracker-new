@@ -1,5 +1,8 @@
+import { QueryClient } from 'react-query';
 import { dateFormat } from 'consts';
 import dayjs, { Dayjs } from 'dayjs';
+
+import { Event } from 'components/HabitTracker/useCalendar';
 
 export const getStartDate = (date: Date) => {
   let newDate = dayjs(date).startOf('M');
@@ -36,7 +39,8 @@ export const generateEventCacheKeys = (dateStart: Dayjs, dateEnd: Dayjs) => {
   return eventKeys;
 };
 
-export function getNewDBItemsAfterEdit<DBItem extends { _id: string }>(
+type DBItemWithId = { _id: string };
+export function getNewDBItemsAfterEdit<DBItem extends DBItemWithId>(
   dbItems: DBItem[] | undefined,
   dbItem: DBItem
 ) {
@@ -45,3 +49,28 @@ export function getNewDBItemsAfterEdit<DBItem extends { _id: string }>(
   newDbItems.splice(index, 1, dbItem);
   return newDbItems;
 }
+
+export function removeDBItemFromArray<DBItem extends DBItemWithId>(
+  dbItems: DBItem[] | undefined,
+  deletedItem: DBItem | undefined
+) {
+  return (dbItems ?? []).filter(dbItem => dbItem._id !== deletedItem?._id);
+}
+
+export const invalidateAllHabitsForGivenLabel = ({
+  queryClient,
+  labelId,
+}: {
+  queryClient: QueryClient;
+  labelId: string;
+}) => {
+  const eventsForInvalidation = (queryClient.getQueriesData<Event[]>(['events']) ?? []).filter(
+    ([cacheKey, events]) => {
+      return Boolean(events.find(event => event?.label?._id === labelId));
+    }
+  );
+  const invalidationPromises = eventsForInvalidation.map(([cacheKey]) =>
+    queryClient.invalidateQueries(cacheKey)
+  );
+  return Promise.all(invalidationPromises);
+};
