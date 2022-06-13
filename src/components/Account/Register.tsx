@@ -8,6 +8,7 @@ import Button from 'components/Button';
 import { Input } from 'components/FormControls';
 import { showToast } from 'components/ToastContainer';
 
+import { ContentWrapper, Wrapper } from './Login';
 import { useUser } from './UserContext';
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -55,37 +56,26 @@ export default function Login() {
 
   return (
     <Wrapper>
-      <h2>Create acount!</h2>
-      <FormWrapper onSubmit={handleSubmit}>
-        <Input htmlFor="email" type="email" name="email" placeholder="example@gmail.com" />
-        <Input htmlFor="login" name="login" placeholder="user123" />
-        <Input htmlFor="password" type="password" name="password" placeholder="password" />
-        <Input
-          htmlFor="passwordRepeat"
-          type="password"
-          name="passwordRepeat"
-          placeholder="password (repeat)"
-        />
-        <Button disabled={isLoading} type="submit">
-          Send
-        </Button>
-      </FormWrapper>
+      <ContentWrapper>
+        <h2>Create acount!</h2>
+        <FormWrapper onSubmit={handleSubmit}>
+          <Input htmlFor="email" type="email" name="email" placeholder="example@gmail.com" />
+          <Input htmlFor="login" name="login" placeholder="user123" />
+          <Input htmlFor="password" type="password" name="password" placeholder="password" />
+          <Input
+            htmlFor="passwordRepeat"
+            type="password"
+            name="passwordRepeat"
+            placeholder="password (repeat)"
+          />
+          <Button disabled={isLoading} type="submit">
+            Send
+          </Button>
+        </FormWrapper>
+      </ContentWrapper>
     </Wrapper>
   );
 }
-
-const Wrapper = styled.main`
-  --gap: ${({ theme }) => theme.spacing[16]};
-  padding: ${({ theme }) => theme.spacing[16]};
-  height: 100%;
-  width: 100%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--gap);
-`;
 
 const FormWrapper = styled.form`
   width: 100%;

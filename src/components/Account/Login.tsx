@@ -48,35 +48,44 @@ export default function Login() {
 
   return (
     <Wrapper>
-      <h2>Welcome again!</h2>
-      <FormWrapper noValidate onSubmit={handleSubmit}>
-        <Input htmlFor="login" name="login" placeholder="user123" minLength={6} />
-        <Input
-          htmlFor="password"
-          type="password"
-          name="password"
-          placeholder="password"
-          minLength={6}
-        />
-        <Button disabled={isLoading} type="submit">
-          Sign in
-        </Button>
-      </FormWrapper>
+      <ContentWrapper>
+        <h2>Welcome again!</h2>
+        <FormWrapper noValidate onSubmit={handleSubmit}>
+          <Input htmlFor="login" name="login" placeholder="user123" minLength={6} />
+          <Input
+            htmlFor="password"
+            type="password"
+            name="password"
+            placeholder="password"
+            minLength={6}
+          />
+          <Button disabled={isLoading} type="submit">
+            Sign in
+          </Button>
+        </FormWrapper>
+      </ContentWrapper>
     </Wrapper>
   );
 }
 
-const Wrapper = styled.main`
+export const ContentWrapper = styled.div`
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: ${({ theme }) => theme.spacing[48]};
+  background-color: ${({ theme }) => theme.colors.grays[1000]};
+  border-radius: ${({ theme }) => theme.cornerRadius.regular};
+`;
+
+export const Wrapper = styled.main`
   --gap: ${({ theme }) => theme.spacing[16]};
   padding: ${({ theme }) => theme.spacing[16]};
   height: 100%;
   width: 100%;
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--gap);
+  display: grid;
+  place-content: center;
 `;
 
 const FormWrapper = styled.form`
