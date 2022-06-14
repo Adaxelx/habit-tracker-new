@@ -68,7 +68,7 @@ export default function Login() {
             name="passwordRepeat"
             placeholder="password (repeat)"
           />
-          <Button disabled={isLoading} type="submit">
+          <Button disabled={!navigator.onLine || isLoading} type="submit">
             Send
           </Button>
         </FormWrapper>

@@ -26,12 +26,12 @@ export default function HabitManager() {
   return (
     <Wrapper>
       <h2>Your habits</h2>
-      {events.isLoading ? (
+      {events.isFetching ? (
         <Loader />
       ) : (
         <>
           <ElementsWrapper>
-            {events.data.map(
+            {events?.data?.map(
               ({
                 _id,
                 title,
@@ -76,12 +76,12 @@ export default function HabitManager() {
           <HabitForm
             isOpen={Boolean(openEditEventId)}
             onClose={() => setOpenEditEventId('')}
-            previousEvent={events.data.find(({ _id }) => _id === openEditEventId)}
+            previousEvent={events?.data?.find(({ _id }) => _id === openEditEventId)}
           />
           <HabitDeleteConfirmation
             isOpen={Boolean(openDeleteEventId)}
             onClose={() => setOpenDeleteEventId('')}
-            habit={events.data.find(({ _id }) => _id === openDeleteEventId)}
+            habit={events?.data?.find(({ _id }) => _id === openDeleteEventId)}
           />
         </>
       )}

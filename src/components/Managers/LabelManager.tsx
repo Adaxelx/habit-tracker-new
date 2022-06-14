@@ -24,12 +24,12 @@ export default function HabitManager() {
   return (
     <Wrapper>
       <h2>Your labels</h2>
-      {labels.isLoading ? (
+      {labels.isFetching ? (
         <Loader />
       ) : (
         <>
           <ElementsWrapper>
-            {labels.data.map(({ _id, title, color }) => (
+            {labels?.data?.map(({ _id, title, color }) => (
               <LabelWrapper key={_id}>
                 <TitleWrapper>
                   <Title>{title}</Title>
@@ -45,15 +45,14 @@ export default function HabitManager() {
           <LabelForm
             isOpen={Boolean(openEditLabelId)}
             onClose={() => setOpenEditLabelId('')}
-            previousLabel={labels.data.find(({ _id }) => _id === openEditLabelId)}
+            previousLabel={labels?.data?.find(({ _id }) => _id === openEditLabelId)}
           />
           <LabelDeleteConfirmation
             isOpen={Boolean(openDeleteLabelId)}
             onClose={() => {
-              console.log('xd');
               setOpenDeleteLabelId('');
             }}
-            label={labels.data.find(({ _id }) => _id === openDeleteLabelId)}
+            label={labels?.data?.find(({ _id }) => _id === openDeleteLabelId)}
           />
         </>
       )}

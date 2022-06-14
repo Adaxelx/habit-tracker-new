@@ -19,13 +19,15 @@ export default function Activity({
   label,
   _id,
 }: ActivityProps) {
-  const mutation = useToggleChecked({ id: _id, date, checked });
+  const { mutate, isPaused, isLoading } = useToggleChecked({ id: _id, date, checked });
+
+  const disabled = !isPaused && isLoading;
 
   return (
     <Wrapper
       onClick={() => {
-        if (!mutation.isLoading) {
-          mutation.mutate();
+        if (!disabled) {
+          mutate();
         }
       }}
     >
@@ -35,7 +37,7 @@ export default function Activity({
         <Subtext>{description}</Subtext>
       </MainContent>
       <Aside>
-        <Checkbox disabled={mutation.isLoading} checked={checked} />
+        <Checkbox disabled={disabled} checked={checked} />
         {label ? <Label color={label.color} /> : null}
         {/* <Badge /> */}
       </Aside>

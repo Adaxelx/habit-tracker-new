@@ -43,7 +43,7 @@ export default function HabitForm({ isOpen, onClose, previousEvent }: HabitFormP
   const [daysOfWeek, setDaysOfWeek] = useState<number[]>([]);
   const [label, setLabel] = useState('');
 
-  const habitMutation = useCreateHabit(onClose, previousEvent?._id);
+  const { mutate, isPaused, isLoading } = useCreateHabit(onClose, previousEvent?._id);
 
   const labels = useQuery<Label[]>(['labels']);
 
@@ -52,7 +52,7 @@ export default function HabitForm({ isOpen, onClose, previousEvent }: HabitFormP
     const data = event.currentTarget.elements;
     const { timeStart, timeEnd, title, dateEnd, dateStart, description } = data;
 
-    habitMutation.mutate({
+    mutate({
       timeStart: timeStart.value,
       timeEnd: timeEnd.value,
       title: title.value,
@@ -71,6 +71,8 @@ export default function HabitForm({ isOpen, onClose, previousEvent }: HabitFormP
       setLabel(previousEvent?.label?._id ?? '');
     }
   }, [previousEvent]);
+
+  const disabled = !isPaused && isLoading;
 
   return (
     <HabitModal isOpen={isOpen} onClose={onClose} title={header}>
@@ -153,7 +155,7 @@ export default function HabitForm({ isOpen, onClose, previousEvent }: HabitFormP
             label={labelTitle}
           />
         ) : null}
-        <Button disabled={habitMutation.isLoading} type="submit">
+        <Button disabled={disabled} type="submit">
           {submit}
         </Button>
       </FormWrapper>

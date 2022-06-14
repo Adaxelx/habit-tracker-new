@@ -44,7 +44,7 @@ export default function LabelForm({ isOpen, onClose, previousLabel }: LabelFormP
     setColor(colors.find(color => color.color === previousLabel?.color));
   }, [previousLabel]);
 
-  const labelMutation = useCreateLabel({ onClose, labelId: previousLabel?._id });
+  const { mutate, isPaused, isLoading } = useCreateLabel({ onClose, labelId: previousLabel?._id });
 
   const handleSubmit = (event: React.FormEvent<LabelFormElement>) => {
     event.preventDefault();
@@ -53,12 +53,14 @@ export default function LabelForm({ isOpen, onClose, previousLabel }: LabelFormP
 
     if (!color) return;
 
-    labelMutation.mutate({
+    mutate({
       title: title.value,
       color: color?.color,
       _id: previousLabel?._id ?? mongoObjectId(),
     });
   };
+
+  const disabled = !isPaused && isLoading;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={header}>
@@ -82,7 +84,7 @@ export default function LabelForm({ isOpen, onClose, previousLabel }: LabelFormP
           selected={color?.displayName ?? ''}
           label={colorLabel}
         />
-        <Button disabled={labelMutation.isLoading} type="submit">
+        <Button disabled={disabled} type="submit">
           {submit}
         </Button>
       </FormWrapper>

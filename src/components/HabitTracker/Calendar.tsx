@@ -19,14 +19,16 @@ interface CalendarProps {
 export default function Calendar({ activeDate, setActiveDate }: CalendarProps) {
   const [navigationDate, setNavigationDate] = useState(new Date());
 
-  const calendarQuery = useCalendar({
+  const { isPaused, isLoading, data } = useCalendar({
     from: getStartDate(navigationDate),
     to: getEndDate(navigationDate),
   });
 
+  const showLoader = !isPaused && isLoading;
+
   return (
     <Wrapper>
-      {calendarQuery.isLoading ? (
+      {showLoader ? (
         <CalendarSkeleton />
       ) : (
         <RCalendar
@@ -40,11 +42,9 @@ export default function Calendar({ activeDate, setActiveDate }: CalendarProps) {
           tileContent={props => {
             return (
               <>
-                {calendarQuery?.data?.[dayjs(props.date).format(dateFormat)]?.map(
-                  (color, index) => (
-                    <Tile {...props} color={color} key={index} index={index} />
-                  )
-                )}
+                {data?.[dayjs(props.date).format(dateFormat)]?.map((color, index) => (
+                  <Tile {...props} color={color} key={index} index={index} />
+                ))}
               </>
             );
           }}

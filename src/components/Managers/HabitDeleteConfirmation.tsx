@@ -17,18 +17,16 @@ export default function HabitDeleteConfirmation({
   onClose,
   habit,
 }: HabitDeleteConfirmationProps) {
-  const deleteHabitMutation = useDeleteHabit({ habit, onClose });
+  const { mutate, isPaused, isLoading } = useDeleteHabit({ habit, onClose });
+  const disabled = isLoading && !isPaused;
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <h4>{`Are you sure you want to delete habit?`}</h4>
       <ButtonWrapper>
-        <Button
-          disabled={deleteHabitMutation.isLoading}
-          onClick={() => deleteHabitMutation.mutate()}
-        >
+        <Button disabled={disabled} onClick={() => mutate()}>
           Yes
         </Button>
-        <Button disabled={deleteHabitMutation.isLoading} onClick={onClose}>
+        <Button disabled={disabled} onClick={onClose}>
           No
         </Button>
       </ButtonWrapper>

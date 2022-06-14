@@ -62,7 +62,8 @@ export default function DayCardWrapper({ activeDate }: DayCardWrapperProps) {
     },
   });
   const refreshKey = useMemo(() => ({ from, to }), [from, to]);
-  if (query.isLoading) {
+
+  if (!query.isPaused && query.isLoading) {
     return (
       <Wrapper>
         {new Array(15).fill(10).map(value => {
@@ -78,7 +79,7 @@ export default function DayCardWrapper({ activeDate }: DayCardWrapperProps) {
 }
 
 interface ViewProps {
-  data: EventsMap;
+  data?: EventsMap;
   activeDate: Date;
   refreshKey: { from: string; to: string };
 }
@@ -88,7 +89,7 @@ function View({ data, activeDate, refreshKey }: ViewProps) {
   useScrollActiveCardToCenter(activeDate, ref);
   return (
     <Wrapper ref={ref}>
-      {Object.entries(data).map(([date, events]) => {
+      {Object.entries(data ?? {}).map(([date, events]) => {
         return (
           <DayCardWithScroll
             date={date}

@@ -26,7 +26,7 @@ type MutationData = { login: string; password: string };
 export default function Login() {
   const navigate = useNavigate();
   const { dispatch, state } = useUser();
-  const { isLoading, mutate } = useMutation<LoginData, any, MutationData>(
+  const { mutate, isLoading } = useMutation<LoginData, any, MutationData>(
     credentials => client('/users/login', { body: credentials }),
     {
       onSuccess: data => {
@@ -59,7 +59,7 @@ export default function Login() {
             placeholder="password"
             minLength={6}
           />
-          <Button disabled={isLoading} type="submit">
+          <Button disabled={!navigator.onLine || isLoading} type="submit">
             Sign in
           </Button>
         </FormWrapper>
